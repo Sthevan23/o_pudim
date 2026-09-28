@@ -13,6 +13,10 @@
     document.getElementById("cart-qty").textContent = String(qty);
     document.getElementById("cart-line").textContent = money(NatalCart.total());
     document.getElementById("cart-total").textContent = money(NatalCart.total());
+    const minus = document.getElementById("qty-minus");
+    const plus = document.getElementById("qty-plus");
+    if (minus) minus.disabled = qty <= 0;
+    if (plus) plus.disabled = qty >= 20;
   }
 
   document.getElementById("qty-minus").addEventListener("click", () => {

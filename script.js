@@ -178,14 +178,22 @@
 
   let natalQty = 1;
   const natalQtyEl = document.getElementById("natal-qty");
-  document.getElementById("natal-minus")?.addEventListener("click", () => {
+  const natalMinus = document.getElementById("natal-minus");
+  const natalPlus = document.getElementById("natal-plus");
+  function syncNatalQty() {
+    if (natalQtyEl) natalQtyEl.textContent = String(natalQty);
+    if (natalMinus) natalMinus.disabled = natalQty <= 1;
+    if (natalPlus) natalPlus.disabled = natalQty >= 20;
+  }
+  natalMinus?.addEventListener("click", () => {
     natalQty = Math.max(1, natalQty - 1);
-    if (natalQtyEl) natalQtyEl.textContent = String(natalQty);
+    syncNatalQty();
   });
-  document.getElementById("natal-plus")?.addEventListener("click", () => {
+  natalPlus?.addEventListener("click", () => {
     natalQty = Math.min(20, natalQty + 1);
-    if (natalQtyEl) natalQtyEl.textContent = String(natalQty);
+    syncNatalQty();
   });
+  syncNatalQty();
   document.getElementById("natal-add")?.addEventListener("click", () => {
     NatalCart.add(natalQty);
     window.location.href = "reserva.html";
