@@ -5,7 +5,7 @@ Site + painel admin para Hostinger (HTML/CSS/JS + PHP + MySQL). Sem Node.
 ## Estrutura
 
 - `index.html`, `style.css`, `script.js` — site público
-- `cart.html` — carrinho / pedido pelo WhatsApp
+- Pedidos pelo WhatsApp (sem carrinho no site)
 - `products/` — fotos
 - `js/` — dados padrão e sync com a API
 - `admin/` — painel
@@ -28,6 +28,6 @@ Painel: `seusite.com/admin/login.html`
 
 Troque a senha depois no banco (`admins.password_hash`) ou pelo painel.
 
-WhatsApp: `(37) 9119-4019` · Instagram: [@opudimgold](https://www.instagram.com/opudimgold) · Cidade: Dianópolis — TO
+WhatsApp: `(37) 9119-4019` · Instagram: [@opudimgold](https://www.instagram.com/opudimgold) · Cidade: Lagoa da Prata — MG
 
 Os preços ficam no painel. No site público eles não aparecem.

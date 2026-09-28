@@ -174,16 +174,16 @@ INSERT INTO `settings` (
   'O! Pudim',
   'Um pedacinho de felicidade em cada colherada',
   'products/logo.png',
-  'products/morango.png',
+  'products/protein.png',
   'products/lotus.png',
   '553791194019',
   'https://www.instagram.com/opudimgold',
   '@opudimgold',
   'ana@pudins.com',
-  'Dianópolis — TO',
+  'Lagoa da Prata — MG',
   'Segunda a sábado, das 9h às 18h',
-  'Pudins artesanais · Dianópolis — TO',
-  'A O! Pudim nasceu em Dianópolis — TO da vontade de transformar um doce clássico em uma experiência. Trabalhamos com receitas artesanais, ingredientes escolhidos a dedo e um acabamento que faz o produto parecer — e ser — especial.',
+  'Pudins artesanais · Lagoa da Prata — MG',
+  'A O! Pudim nasceu em Lagoa da Prata — MG da vontade de transformar um doce clássico em uma experiência. Trabalhamos com receitas artesanais, ingredientes escolhidos a dedo e um acabamento que faz o produto parecer — e ser — especial.',
   'Do tradicional ao sabor da estação, cada unidade é feita para encantar no primeiro olhar e no último gole.',
   'Olá! Gostaria de fazer um pedido.',
   1,
@@ -191,6 +191,7 @@ INSERT INTO `settings` (
 );
 
 INSERT INTO `categories` (`id`, `name`, `slug`, `sort_order`) VALUES
+('cat-copo', 'Copos', 'copos', 0),
 ('cat-trad', 'Tradicionais', 'tradicionais', 1),
 ('cat-choc', 'Chocolates', 'chocolates', 2),
 ('cat-esp', 'Especiais', 'especiais', 3),
@@ -198,7 +199,10 @@ INSERT INTO `categories` (`id`, `name`, `slug`, `sort_order`) VALUES
 ('cat-edi', 'Edições especiais', 'edicoes-especiais', 5);
 
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `category_id`, `image`, `featured`, `slug`, `promo_active`, `promo_price`, `best_seller`, `active`, `sort_order`) VALUES
-('p-trad', 'Pudim Tradicional', 'Nosso clássico, cremoso e irresistível.', 8.00, 'cat-trad', 'products/icedim.png', 1, 'pudim-tradicional', 0, NULL, 1, 1, 1),
+('p-joao', 'Que Ele cresça', 'Copo especial com a mensagem de João 3:30. Cremoso, com calda de caramelo e tampa dourada.', 12.00, 'cat-copo', 'products/joao-330.png', 1, 'que-ele-cresca', 0, NULL, 1, 1, 0),
+('p-trem', 'Uai, que trem bão!', 'Edição mineira, no copo, com calda de caramelo. Sabor da casa com sotaque de Minas.', 12.00, 'cat-copo', 'products/trem-bao.png', 1, 'uai-que-trem-bao', 0, NULL, 1, 1, 1),
+('p-protein', 'O! Pudim Protein', 'Zero adição de açúcares, 19g de proteína e whey. Rico em proteínas e cálcio.', 14.00, 'cat-copo', 'products/protein.png', 1, 'pudim-protein', 0, NULL, 1, 1, 2),
+('p-trad', 'Pudim Tradicional', 'Nosso clássico, cremoso e irresistível.', 8.00, 'cat-trad', 'products/icedim.png', 1, 'pudim-tradicional', 0, NULL, 1, 1, 3),
 ('p-choc', 'Pudim de Chocolate', 'Cacau intenso, textura aveludada e um toque de biscoito.', 9.00, 'cat-choc', 'products/chocolate-biscoito.png', 1, 'pudim-chocolate', 0, NULL, 1, 1, 2),
 ('p-ninho', 'Pudim de Leite Ninho', 'Doce de leite em pó no ponto certo, leve e cremoso.', 9.50, 'cat-trad', 'products/nozes.png', 1, 'pudim-leite-ninho', 1, 8.50, 1, 1, 3),
 ('p-coco', 'Pudim de Coco', 'Coco fresco, cobertura branca e um sabor que lembra infância.', 9.00, 'cat-trad', 'products/caju-goiabada.png', 0, 'pudim-coco', 0, NULL, 0, 1, 4),
@@ -213,14 +217,17 @@ INSERT INTO `products` (`id`, `name`, `description`, `price`, `category_id`, `im
 ('p-caramelo', 'Paleta Caramelo Salgado', 'Caramelo, flor de sal e chocolate. Equilíbrio perfeito.', 12.00, 'cat-esp', 'products/caramelo-salgado.png', 0, 'paleta-caramelo-salgado', 1, 10.90, 0, 1, 13);
 
 INSERT INTO `gallery` (`image`, `sort_order`) VALUES
-('products/morango.png', 1),
-('products/lotus.png', 2),
-('products/ferrero-gold.png', 3),
-('products/maracuja.png', 4),
-('products/icedim.png', 5),
-('products/donut.png', 6),
-('products/frutas-vermelhas.png', 7),
-('products/avela.png', 8);
+('products/joao-330.png', 0),
+('products/trem-bao.png', 1),
+('products/protein.png', 2),
+('products/morango.png', 3),
+('products/lotus.png', 4),
+('products/ferrero-gold.png', 5),
+('products/maracuja.png', 6),
+('products/icedim.png', 7),
+('products/donut.png', 8),
+('products/frutas-vermelhas.png', 9),
+('products/avela.png', 10);
 
 INSERT INTO `reviews` (`id`, `author`, `text`, `rating`) VALUES
 ('r1', 'Camila Ferreira', 'O pudim tradicional é o melhor que já comi. Cremoso, no ponto, e a apresentação é linda.', 5),
@@ -229,3 +236,12 @@ INSERT INTO `reviews` (`id`, `author`, `text`, `rating`) VALUES
 ('r4', 'Bruno Almeida', 'A edição Ferrero Gold vale cada centavo. Parece presente.', 4);
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- Se o banco já foi importado, rode só isto no phpMyAdmin:
+-- INSERT IGNORE INTO `categories` (`id`, `name`, `slug`, `sort_order`) VALUES ('cat-copo', 'Copos', 'copos', 0);
+-- INSERT IGNORE INTO `products` (`id`, `name`, `description`, `price`, `category_id`, `image`, `featured`, `slug`, `promo_active`, `promo_price`, `best_seller`, `active`, `sort_order`) VALUES
+-- ('p-joao', 'Que Ele cresça', 'Copo especial com a mensagem de João 3:30. Cremoso, com calda de caramelo e tampa dourada.', 12.00, 'cat-copo', 'products/joao-330.png', 1, 'que-ele-cresca', 0, NULL, 1, 1, 0),
+-- ('p-trem', 'Uai, que trem bão!', 'Edição mineira, no copo, com calda de caramelo. Sabor da casa com sotaque de Minas.', 12.00, 'cat-copo', 'products/trem-bao.png', 1, 'uai-que-trem-bao', 0, NULL, 1, 1, 1),
+-- ('p-protein', 'O! Pudim Protein', 'Zero adição de açúcares, 19g de proteína e whey. Rico em proteínas e cálcio.', 14.00, 'cat-copo', 'products/protein.png', 1, 'pudim-protein', 0, NULL, 1, 1, 2);
+-- INSERT IGNORE INTO `gallery` (`image`, `sort_order`) VALUES ('products/joao-330.png', 0), ('products/trem-bao.png', 1), ('products/protein.png', 2);
+-- UPDATE `settings` SET `banner` = 'products/protein.png', `address` = 'Lagoa da Prata — MG', `hero_badge` = 'Pudins artesanais · Lagoa da Prata — MG' WHERE `id` = 1;

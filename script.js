@@ -1,18 +1,8 @@
 (function () {
-  const hidePrices = true;
   let category = "todos";
-
-  function money(n) {
-    return Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  }
 
   function wa(text) {
     return Storage.waLink(text);
-  }
-
-  function updateCartBadge() {
-    const el = document.getElementById("cart-count");
-    if (el) el.textContent = String(PudimCart.count());
   }
 
   function productCard(product, categoryName) {
@@ -52,7 +42,7 @@
     const sobreText = document.getElementById("sobre-text");
     if (sobreText) sobreText.textContent = [settings.sobreText1, settings.sobreText2].filter(Boolean).join(" ");
     const addr = document.getElementById("contact-address");
-    if (addr) addr.textContent = settings.address || "Dianópolis — TO";
+    if (addr) addr.textContent = settings.address || "Lagoa da Prata — MG";
     const hours = document.getElementById("contact-hours");
     if (hours) hours.textContent = settings.hours || "";
     const ig = document.getElementById("ig-link");
@@ -97,8 +87,6 @@
           <small>${r.author}</small>
         </article>`).join("");
     }
-
-    updateCartBadge();
   }
 
   document.addEventListener("click", (e) => {
@@ -112,14 +100,7 @@
     if (add) {
       const product = Storage.getProducts().find((p) => p.id === add.getAttribute("data-add"));
       if (!product) return;
-      PudimCart.add(product, 1);
-      updateCartBadge();
-      const t = document.getElementById("site-toast");
-      if (t) {
-        t.classList.add("show");
-        clearTimeout(t._hide);
-        t._hide = setTimeout(() => t.classList.remove("show"), 1600);
-      }
+      window.open(wa(`Olá! Gostaria de pedir o ${product.name}.`), "_blank");
       return;
     }
     const lite = e.target.closest("[data-lite]");
@@ -154,6 +135,4 @@
   });
 
   Storage.loadCatalog().then(render).catch(render);
-  PudimCart.onChange(updateCartBadge);
-  updateCartBadge();
 })();

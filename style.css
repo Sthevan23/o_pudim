@@ -366,9 +366,7 @@ h1, h2, h3, p { margin: 0; }
   }
   .header__nav.is-open a { padding: 0.55rem 0.2rem; }
   .header__toggle { display: flex; order: -1; }
-  .header__cart-label { display: none; }
-  .header__cart { padding: 0.5rem 0.65rem; }
-  .brand { font-size: 1.15rem; gap: 0.45rem; }
+  .brand { margin-right: auto; font-size: 1.15rem; gap: 0.45rem; }
   .brand img { width: 34px; height: 34px; }
   .card__body { padding: 0.7rem 0.75rem 0.85rem; }
   .card h3 { font-size: 1rem; line-height: 1.2; }
