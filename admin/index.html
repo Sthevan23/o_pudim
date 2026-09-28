@@ -8,7 +8,7 @@
   <link rel="icon" href="../products/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="admin.css?v=5">
+  <link rel="stylesheet" href="admin.css?v=6">
   <script>if (sessionStorage.getItem("admin_logged") !== "true") location.replace("login.html");</script>
 </head>
 <body>
@@ -111,15 +111,15 @@
     <section class="admin-page" id="page-config">
       <form class="page-card" id="settings-form">
         <div class="form-grid">
-          <div class="form-group"><label>Nome</label><input id="s-name"></div>
+          <div class="form-group"><label>Nome</label><input id="s-name" spellcheck="false" lang="pt-BR"></div>
           <div class="form-group"><label>WhatsApp (com DDI)</label><input id="s-wa"></div>
           <div class="form-group"><label>Instagram</label><input id="s-ig"></div>
           <div class="form-group"><label>@ do Instagram</label><input id="s-igu"></div>
           <div class="form-group full"><label>Endereço</label><input id="s-address"></div>
           <div class="form-group full"><label>Horário</label><input id="s-hours"></div>
-          <div class="form-group full"><label>Texto sobre 1</label><textarea id="s-t1" rows="3"></textarea></div>
-          <div class="form-group full"><label>Texto sobre 2</label><textarea id="s-t2" rows="3"></textarea></div>
-          <div class="form-group full"><label>Texto sobre 3</label><textarea id="s-t3" rows="2"></textarea></div>
+          <div class="form-group full"><label>Texto sobre 1</label><textarea id="s-t1" rows="3" spellcheck="false" lang="pt-BR"></textarea></div>
+          <div class="form-group full"><label>Texto sobre 2</label><textarea id="s-t2" rows="3" spellcheck="false" lang="pt-BR"></textarea></div>
+          <div class="form-group full"><label>Texto sobre 3</label><textarea id="s-t3" rows="2" spellcheck="false" lang="pt-BR"></textarea></div>
           <div class="form-group full"><label><input type="checkbox" id="s-natal" checked> Mostrar reserva de Natal no site</label></div>
           <div class="form-group full"><label><input type="checkbox" id="s-hide"> Esconder preços no site público</label></div>
         </div>
@@ -134,11 +134,11 @@
       <form id="product-form">
         <input type="hidden" id="p-id">
         <div class="form-grid">
-          <div class="form-group"><label>Nome</label><input id="p-name" required placeholder="Ex.: Pudim Tradicional"></div>
+          <div class="form-group"><label>Nome</label><input id="p-name" required placeholder="Ex.: Pudim Tradicional" spellcheck="false" lang="pt-BR"></div>
           <div class="form-group"><label>Categoria</label><select id="p-cat"></select></div>
-          <div class="form-group full"><label>Legenda (texto do cardápio)</label><textarea id="p-desc" rows="3" required placeholder="Texto que o cliente lê no site"></textarea></div>
+          <div class="form-group full"><label>Legenda (texto do cardápio)</label><textarea id="p-desc" rows="3" required placeholder="Texto que o cliente lê no site" spellcheck="false" lang="pt-BR"></textarea></div>
           <div class="form-group"><label>Preço</label><input id="p-price" type="number" step="0.01" min="0"></div>
-          <div class="form-group"><label>Caminho da foto</label><input id="p-image" placeholder="products/..."></div>
+          <div class="form-group"><label>Caminho da foto</label><input id="p-image" placeholder="products/..." spellcheck="false"></div>
           <div class="form-group full">
             <label>Enviar foto</label>
             <input id="p-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp">
