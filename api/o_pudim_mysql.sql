@@ -183,8 +183,8 @@ INSERT INTO `settings` (
   'Lagoa da Prata — MG',
   'Segunda a sábado, das 9h às 18h',
   'Pudins artesanais · Lagoa da Prata — MG',
-  'A O! Pudim nasceu em Lagoa da Prata — MG da vontade de transformar um doce clássico em uma experiência. Trabalhamos com receitas artesanais, ingredientes escolhidos a dedo e um acabamento que faz o produto parecer — e ser — especial.',
-  'Do tradicional ao sabor da estação, cada unidade é feita para encantar no primeiro olhar e no último gole.',
+  'A O! Pudim nasceu em Lagoa da Prata, Minas Gerais, com fé, gratidão e o desejo de transformar doces momentos em experiências especiais. Em cada etapa, buscamos honrar a Deus com dedicação, cuidado e amor pelo que fazemos.',
+  'Preparamos nossas receitas artesanalmente, com ingredientes selecionados e atenção a cada detalhe — do sabor à apresentação. Do pudim tradicional às criações da estação, cada delícia é feita para encantar, compartilhar e adoçar bons momentos. Que cada criação leve consigo um pouco do nosso carinho e da nossa fé. Para a honra e a glória de Deus.',
   'Olá! Gostaria de fazer um pedido.',
   1,
   1

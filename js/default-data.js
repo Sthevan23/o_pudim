@@ -14,8 +14,9 @@ const OPUDIM_DEFAULT_DATA = {
     address: "Lagoa da Prata — MG",
     hours: "Segunda a sábado, das 9h às 18h",
     heroBadge: "Pudins artesanais · Lagoa da Prata — MG",
-    sobreText1: "A O! Pudim nasceu em Lagoa da Prata — MG da vontade de transformar um doce clássico em uma experiência. Trabalhamos com receitas artesanais, ingredientes escolhidos a dedo e um acabamento que faz o produto parecer — e ser — especial.",
-    sobreText2: "Do tradicional ao sabor da estação, cada unidade é feita para encantar no primeiro olhar e no último gole.",
+    sobreText1: "A O! Pudim nasceu em Lagoa da Prata, Minas Gerais, com fé, gratidão e o desejo de transformar doces momentos em experiências especiais. Em cada etapa, buscamos honrar a Deus com dedicação, cuidado e amor pelo que fazemos.",
+    sobreText2: "Preparamos nossas receitas artesanalmente, com ingredientes selecionados e atenção a cada detalhe — do sabor à apresentação. Do pudim tradicional às criações da estação, cada delícia é feita para encantar, compartilhar e adoçar bons momentos.",
+    sobreText3: "Que cada criação leve consigo um pouco do nosso carinho e da nossa fé. Para a honra e a glória de Deus.",
     whatsappMessage: "Olá! Gostaria de fazer um pedido.",
     hidePrices: true
   },
@@ -68,6 +69,29 @@ const OPUDIM_DEFAULT_DATA = {
     { id: "r3", author: "Juliana Costa", text: "Atendimento rápido no WhatsApp e o gelato de maracujá é viciante.", rating: 5 },
     { id: "r4", author: "Bruno Almeida", text: "A edição Ferrero Gold vale cada centavo. Parece presente.", rating: 4 }
   ],
+  partners: {
+    pudins: [
+      { name: "Restaurante do Taioba", logo: "products/partners/taioba.png" },
+      { name: "Restaurante 2002" },
+      { name: "Restaurante Predileto" },
+      { name: "Restaurante Tia Maria" },
+      { name: "Restaurante Sabor de Casa" },
+      { name: "Supermercados Joãozinho", logo: "products/partners/joaozinho.png" },
+      { name: "Supermercado Temmax", logo: "products/partners/temmax.png" },
+      { name: "Kenko" },
+      { name: "Suki" },
+      { name: "Texas" },
+      { name: "Hamburgueria Meio Kilo", logo: "products/partners/meio-kilo.png" },
+      { name: "Barracão Burguer" },
+      { name: "Arena LBS" },
+      { name: ".7 Express", logo: "products/partners/express-7.png" },
+      { name: "Läut", logo: "products/partners/laut.png" }
+    ],
+    gelatos: [
+      { name: "Restaurante do Taioba", logo: "products/partners/taioba.png" },
+      { name: ".7 Express", logo: "products/partners/express-7.png" }
+    ]
+  },
   clients: [],
   orders: [],
   finance: []

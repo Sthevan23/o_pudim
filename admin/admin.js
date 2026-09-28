@@ -97,6 +97,7 @@ function renderAll() {
   document.getElementById("s-hours").value = s.hours || "";
   document.getElementById("s-t1").value = s.sobreText1 || "";
   document.getElementById("s-t2").value = s.sobreText2 || "";
+  document.getElementById("s-t3").value = s.sobreText3 || "";
   document.getElementById("s-hide").checked = s.hidePrices !== false;
   document.getElementById("p-cat").innerHTML = Storage.getCategories().map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
 }
@@ -210,6 +211,7 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
     hours: document.getElementById("s-hours").value.trim(),
     sobreText1: document.getElementById("s-t1").value.trim(),
     sobreText2: document.getElementById("s-t2").value.trim(),
+    sobreText3: document.getElementById("s-t3").value.trim(),
     hidePrices: document.getElementById("s-hide").checked,
   };
   Storage.setMemory(data);

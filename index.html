@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
   <header class="header" id="header">
@@ -21,8 +21,9 @@
         <span id="brand-name">O! Pudim</span>
       </a>
       <nav class="header__nav" id="nav-menu">
-        <a href="#sobre">Sobre</a>
+        <a href="#sobre">A casa</a>
         <a href="#sabores">Sabores</a>
+        <a href="#parceiros">Parceiros</a>
         <a href="#galeria">Galeria</a>
         <a href="#contato">Contato</a>
         <a class="btn btn--primary" id="nav-wa" href="#" target="_blank" rel="noopener">Peça pelo WhatsApp</a>
@@ -53,13 +54,17 @@
         <img src="products/lotus.png" alt="Produção artesanal" id="sobre-image">
         <div>
           <p class="eyebrow">A casa</p>
-          <h2 class="section__title">Feito com carinho, pensado para você.</h2>
-          <p class="section__lead" id="sobre-text"></p>
+          <h2 class="section__title">Com Deus no centro, feito com carinho para você.</h2>
+          <div class="about__copy" id="sobre-copy">
+            <p class="section__lead" id="sobre-text-1">A O! Pudim nasceu em Lagoa da Prata, Minas Gerais, com fé, gratidão e o desejo de transformar doces momentos em experiências especiais. Em cada etapa, buscamos honrar a Deus com dedicação, cuidado e amor pelo que fazemos.</p>
+            <p class="section__lead" id="sobre-text-2">Preparamos nossas receitas artesanalmente, com ingredientes selecionados e atenção a cada detalhe — do sabor à apresentação. Do pudim tradicional às criações da estação, cada delícia é feita para encantar, compartilhar e adoçar bons momentos.</p>
+            <p class="section__lead" id="sobre-text-3">Que cada criação leve consigo um pouco do nosso carinho e da nossa fé. Para a honra e a glória de Deus.</p>
+          </div>
           <div class="chips">
-            <span>Qualidade</span>
+            <span>Com Deus no centro</span>
+            <span>Feito com carinho</span>
+            <span>Receitas artesanais</span>
             <span>Ingredientes selecionados</span>
-            <span>Produção artesanal</span>
-            <span>Atendimento próximo</span>
           </div>
         </div>
       </div>
@@ -80,6 +85,17 @@
         <p class="section__lead">Clássicos cremosos, paletas especiais e gelatos artesanais.</p>
         <div class="filters" id="category-filter"></div>
         <div class="products__grid" id="products-grid"></div>
+      </div>
+    </section>
+
+    <section class="section partners reveal" id="parceiros">
+      <div class="container">
+        <p class="eyebrow">Onde encontrar</p>
+        <h2 class="section__title">Nossos produtos estão disponíveis em nossos parceiros</h2>
+        <h3 class="partners__group">Pudins</h3>
+        <div class="partners__grid" id="partners-pudins"></div>
+        <h3 class="partners__group">Picolés, IceDim e Gelatos</h3>
+        <div class="partners__grid" id="partners-gelatos"></div>
       </div>
     </section>
 
@@ -130,14 +146,14 @@
   </main>
 
   <footer class="footer">
-    © <span id="year"></span> O! Pudim · Lagoa da Prata — MG. Feito com carinho.
+    © <span id="year"></span> O! Pudim · Lagoa da Prata — MG. Com Deus no centro.
   </footer>
 
   <a class="wa-float" id="wa-float" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
   <div class="lightbox" id="lightbox" hidden></div>
 
-  <script src="js/default-data.js?v=3"></script>
+  <script src="js/default-data.js?v=4"></script>
   <script src="js/storage.js?v=1"></script>
-  <script src="script.js?v=6"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>

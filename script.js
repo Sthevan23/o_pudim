@@ -13,10 +13,21 @@
           <p class="card__cat">${categoryName || ""}</p>
           <h3>${product.name}</h3>
           <p>${product.description || ""}</p>
-          <div class="card__actions">
-            <button class="btn btn--primary" data-add="${product.id}">Quero esse</button>
-          </div>
         </div>
+      </article>`;
+  }
+
+  function partnerCard(partner) {
+    if (partner.logo) {
+      return `
+        <article class="partner-card">
+          <img src="${partner.logo}" alt="${partner.name}">
+          <p>${partner.name}</p>
+        </article>`;
+    }
+    return `
+      <article class="partner-card partner-card--text">
+        <p>${partner.name}</p>
       </article>`;
   }
 
@@ -39,8 +50,12 @@
     if (heroImg) heroImg.src = settings.banner || products[0]?.image || heroImg.src;
     const sobreImg = document.getElementById("sobre-image");
     if (sobreImg) sobreImg.src = settings.sobreImage || sobreImg.src;
-    const sobreText = document.getElementById("sobre-text");
-    if (sobreText) sobreText.textContent = [settings.sobreText1, settings.sobreText2].filter(Boolean).join(" ");
+    const t1 = document.getElementById("sobre-text-1");
+    if (t1 && settings.sobreText1) t1.textContent = settings.sobreText1;
+    const t2 = document.getElementById("sobre-text-2");
+    if (t2 && settings.sobreText2) t2.textContent = settings.sobreText2;
+    const t3 = document.getElementById("sobre-text-3");
+    if (t3 && settings.sobreText3) t3.textContent = settings.sobreText3;
     const addr = document.getElementById("contact-address");
     if (addr) addr.textContent = settings.address || "Lagoa da Prata — MG";
     const hours = document.getElementById("contact-hours");
@@ -87,6 +102,12 @@
           <small>${r.author}</small>
         </article>`).join("");
     }
+
+    const partners = (typeof OPUDIM_DEFAULT_DATA !== "undefined" && OPUDIM_DEFAULT_DATA.partners) || {};
+    const pudins = document.getElementById("partners-pudins");
+    if (pudins) pudins.innerHTML = (partners.pudins || []).map(partnerCard).join("");
+    const gelatos = document.getElementById("partners-gelatos");
+    if (gelatos) gelatos.innerHTML = (partners.gelatos || []).map(partnerCard).join("");
   }
 
   document.addEventListener("click", (e) => {
@@ -94,13 +115,6 @@
     if (cat) {
       category = cat.getAttribute("data-cat");
       render();
-      return;
-    }
-    const add = e.target.closest("[data-add]");
-    if (add) {
-      const product = Storage.getProducts().find((p) => p.id === add.getAttribute("data-add"));
-      if (!product) return;
-      window.open(wa(`Olá! Gostaria de pedir o ${product.name}.`), "_blank");
       return;
     }
     const lite = e.target.closest("[data-lite]");
