@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrinho — O! Pudim</title>
+  <link rel="icon" href="products/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+  <header class="header header--scrolled">
+    <div class="container header__inner">
+      <a href="index.html" class="brand">
+        <img src="products/logo.png" alt="O! Pudim">
+        <span>O! Pudim</span>
+      </a>
+      <a class="btn btn--outline" href="index.html">Voltar ao cardápio</a>
+    </div>
+  </header>
+
+  <main class="cart-page">
+    <div class="container">
+      <p class="eyebrow">Seu pedido</p>
+      <h1 class="section__title">Carrinho</h1>
+      <div class="cart-layout">
+        <div id="cart-list"></div>
+        <aside class="cart-box">
+          <h3>Finalizar</h3>
+          <p class="muted">O pedido entra no painel e você confirma no WhatsApp.</p>
+          <label>Nome<input class="field" id="name" required placeholder="Seu nome"></label>
+          <label>WhatsApp<input class="field" id="phone" required placeholder="(37) 9119-4019"></label>
+          <label>Observações<textarea class="field" id="notes" rows="3" placeholder="Retirada, entrega, horário..."></textarea></label>
+          <p id="cart-empty-note" class="muted"></p>
+          <button class="btn btn--wa btn--full" id="checkout"><i class="fab fa-whatsapp"></i> Enviar pedido</button>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/default-data.js?v=1"></script>
+  <script src="js/storage.js?v=1"></script>
+  <script src="js/cart.js?v=1"></script>
+  <script>
+    const list = document.getElementById("cart-list");
+    const saved = PudimCart.loadCustomer();
+    if (saved.name) document.getElementById("name").value = saved.name;
+    if (saved.phone) document.getElementById("phone").value = saved.phone;
+
+    function renderCart() {
+      const items = PudimCart.getItems();
+      if (!items.length) {
+        list.innerHTML = '<p class="muted">Seu carrinho está vazio. <a href="index.html#sabores">Ver sabores</a></p>';
+        return;
+      }
+      list.innerHTML = items.map((item) => `
+        <div class="cart-item">
+          <img src="${item.image || "products/logo.png"}" alt="">
+          <div>
+            <strong>${item.name}</strong>
+            <div class="qty">
+              <button data-qty="${item.productId}" data-d="-1">−</button>
+              <span>${item.qty}</span>
+              <button data-qty="${item.productId}" data-d="1">+</button>
+              <button data-del="${item.productId}">remover</button>
+            </div>
+          </div>
+        </div>`).join("");
+    }
+
+    document.addEventListener("click", (e) => {
+      const q = e.target.closest("[data-qty]");
+      if (q) {
+        const item = PudimCart.getItems().find((i) => i.productId === q.getAttribute("data-qty"));
+        if (item) PudimCart.setQty(item.productId, item.qty + Number(q.getAttribute("data-d")));
+        renderCart();
+      }
+      const del = e.target.closest("[data-del]");
+      if (del) {
+        PudimCart.remove(del.getAttribute("data-del"));
+        renderCart();
+      }
+    });
+
+    document.getElementById("checkout").addEventListener("click", async () => {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const notes = document.getElementById("notes").value.trim();
+      const items = PudimCart.getItems();
+      if (!items.length) return alert("Adicione um sabor primeiro.");
+      if (name.length < 2 || phone.replace(/\D/g, "").length < 10) return alert("Preencha nome e WhatsApp.");
+      PudimCart.saveCustomer({ name, phone });
+      const order = {
+        clientName: name,
+        clientWhatsapp: phone,
+        notes,
+        items: items.map((i) => ({ productId: i.productId, name: i.name, qty: i.qty, price: i.price || 0 })),
+      };
+      try { await Storage.createOrderAsync(order, { name, phone }); } catch (err) { console.warn(err); }
+      const lines = items.map((i) => `• ${i.qty}x ${i.name}`).join("%0A");
+      const text = `Olá! Meu nome é ${name}.%0AQuero pedir:%0A${lines}${notes ? "%0AObs: " + encodeURIComponent(notes) : ""}`;
+      const num = String(Storage.getSettings().whatsapp || "553791194019").replace(/\D/g, "");
+      PudimCart.clear();
+      window.location.href = `https://wa.me/${num}?text=${text}`;
+    });
+
+    Storage.loadCatalog().finally(renderCart);
+  </script>
+</body>
+</html>

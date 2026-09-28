@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="O! Pudim — pudins artesanais, paletas e gelatos em Dianópolis — TO. Peça pelo WhatsApp.">
+  <title>O! Pudim — pudins artesanais</title>
+  <link rel="icon" href="products/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#topo" class="brand">
+        <img src="products/logo.png" alt="O! Pudim" id="brand-logo">
+        <span id="brand-name">O! Pudim</span>
+      </a>
+      <button class="header__toggle" id="nav-toggle" aria-label="Abrir menu"><span></span><span></span></button>
+      <nav class="header__nav" id="nav-menu">
+        <a href="#sobre">Sobre</a>
+        <a href="#sabores">Sabores</a>
+        <a href="#galeria">Galeria</a>
+        <a href="#contato">Contato</a>
+        <a class="btn btn--primary" id="nav-wa" href="#" target="_blank" rel="noopener">Peça pelo WhatsApp</a>
+      </nav>
+      <a class="header__cart" href="cart.html" aria-label="Carrinho">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span>Carrinho</span>
+        <span class="header__cart-count" id="cart-count">0</span>
+      </a>
+    </div>
+  </header>
+
+  <main id="topo">
+    <section class="hero">
+      <div class="container hero__grid">
+        <div>
+          <p class="eyebrow" id="hero-badge">Receitas artesanais</p>
+          <h1 id="hero-title">Um pedacinho de felicidade em cada colherada.</h1>
+          <p id="hero-sub">Pudins artesanais preparados com carinho, qualidade e aquele sabor que dá vontade de repetir.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#sabores">Conheça nossos sabores</a>
+            <a class="btn btn--outline" id="hero-wa" href="#" target="_blank" rel="noopener">Peça pelo WhatsApp</a>
+          </div>
+        </div>
+        <div class="hero__photo">
+          <img src="products/morango.png" alt="O! Pudim" id="hero-image">
+        </div>
+      </div>
+    </section>
+
+    <section class="section about" id="sobre">
+      <div class="container about__grid">
+        <img src="products/lotus.png" alt="Produção artesanal" id="sobre-image">
+        <div>
+          <p class="eyebrow">A casa</p>
+          <h2 class="section__title">Feito com carinho, pensado para você.</h2>
+          <p class="section__lead" id="sobre-text"></p>
+          <div class="chips">
+            <span>Qualidade</span>
+            <span>Ingredientes selecionados</span>
+            <span>Produção artesanal</span>
+            <span>Atendimento próximo</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="destaques">
+      <div class="container">
+        <p class="eyebrow">Favoritos da casa</p>
+        <h2 class="section__title">Mais pedidos</h2>
+        <div class="bestsellers__grid" id="bestsellers-grid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="sabores">
+      <div class="container">
+        <p class="eyebrow">Cardápio</p>
+        <h2 class="section__title">Nossos Pudins</h2>
+        <p class="section__lead">Clássicos cremosos, paletas especiais e gelatos artesanais.</p>
+        <div class="filters" id="category-filter"></div>
+        <div class="products__grid" id="products-grid"></div>
+      </div>
+    </section>
+
+    <section class="section diff">
+      <div class="container">
+        <h2 class="section__title">Por que escolher nossos pudins?</h2>
+        <div class="diff__grid">
+          <article><i class="fa-solid fa-hand-holding-heart"></i><h3>Produção artesanal</h3><p>Pequenos lotes, receitas cuidadas e textura cremosa em cada unidade.</p></article>
+          <article><i class="fa-solid fa-leaf"></i><h3>Ingredientes selecionados</h3><p>Leite, chocolate, frutas e essências escolhidos pelo sabor — não pelo atalho.</p></article>
+          <article><i class="fa-solid fa-heart"></i><h3>Feitos com carinho</h3><p>O mesmo cuidado de uma confeitaria de família, do preparo à entrega.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="galeria">
+      <div class="container">
+        <h2 class="section__title">Um pouco do nosso universo</h2>
+        <div class="gallery__masonry" id="gallery-grid"></div>
+      </div>
+    </section>
+
+    <section class="section reviews">
+      <div class="container">
+        <h2 class="section__title">Quem prova, recomenda</h2>
+        <div class="reviews__grid" id="reviews-grid"></div>
+      </div>
+    </section>
+
+    <section class="section" style="text-align:center">
+      <div class="container">
+        <h2 class="section__title">Siga a gente no Instagram</h2>
+        <p class="section__lead" style="margin-inline:auto">Novidades, bastidores e sabores da semana.</p>
+        <p style="margin-top:1.4rem"><a class="btn btn--primary" id="ig-link" href="https://www.instagram.com/opudimgold" target="_blank" rel="noopener"><i class="fab fa-instagram"></i> @opudimgold</a></p>
+      </div>
+    </section>
+
+    <section class="section contact" id="contato">
+      <div class="container">
+        <h2 class="section__title">Vamos adoçar o seu dia?</h2>
+        <div class="meta">
+          <p id="contact-address">Dianópolis — TO</p>
+          <p id="contact-hours">Segunda a sábado, das 9h às 18h</p>
+          <p id="contact-phone">(37) 9119-4019</p>
+        </div>
+        <a class="btn btn--primary" id="contact-wa" href="#" target="_blank" rel="noopener">Fazer pedido pelo WhatsApp</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    © <span id="year"></span> O! Pudim · Dianópolis — TO. Feito com carinho.
+  </footer>
+
+  <a class="wa-float" id="wa-float" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+  <div class="lightbox" id="lightbox" hidden></div>
+
+  <script src="js/default-data.js?v=1"></script>
+  <script src="js/storage.js?v=1"></script>
+  <script src="js/cart.js?v=1"></script>
+  <script src="script.js?v=2"></script>
+</body>
+</html>

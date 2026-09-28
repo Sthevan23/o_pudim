@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Login — O! Pudim</title>
+  <link rel="icon" href="../products/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="login-page">
+  <div class="login">
+    <div class="login__visual">
+      <div class="login__overlay"></div>
+      <div class="login__visual-content">
+        <img src="../products/logo.png" alt="" style="width:72px;height:72px;border-radius:50%;margin:0 auto 12px;object-fit:cover">
+        <h1>O! Pudim</h1>
+        <p>Painel da confeitaria</p>
+      </div>
+    </div>
+    <div class="login__form-wrapper">
+      <form id="login-form" style="width:100%">
+        <h2 style="font-family:var(--display);margin-bottom:6px">Bem-vindo de volta</h2>
+        <p style="color:var(--muted);margin-bottom:18px">Entre para gerenciar o cardápio e os pedidos.</p>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="email" value="ana@pudins.com" required>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <div class="input-password">
+            <input type="password" id="password" required>
+            <button type="button" class="btn btn--secondary" id="toggle-pass"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <button class="btn btn--primary btn--full" id="login-btn" type="submit"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+        <p class="login__error" id="login-error"></p>
+        <p style="margin-top:16px"><a href="../index.html"><i class="fas fa-arrow-left"></i> Voltar ao site</a></p>
+      </form>
+    </div>
+  </div>
+  <script src="../js/default-data.js?v=1"></script>
+  <script src="../js/storage.js?v=1"></script>
+  <script>
+    if (sessionStorage.getItem("admin_logged") === "true") location.href = "index.html";
+    document.getElementById("toggle-pass").onclick = function () {
+      const i = document.getElementById("password");
+      i.type = i.type === "password" ? "text" : "password";
+    };
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const err = document.getElementById("login-error");
+      const btn = document.getElementById("login-btn");
+      err.style.display = "none";
+      btn.disabled = true;
+      try {
+        const result = await Storage.loginAsync(email, password);
+        if (result?.ok) {
+          sessionStorage.setItem("admin_logged", "true");
+          sessionStorage.setItem("admin_email", email);
+          sessionStorage.setItem("admin_password", password);
+          location.href = "index.html";
+          return;
+        }
+        throw new Error("E-mail ou senha incorretos.");
+      } catch (ex) {
+        const fallback = (typeof OPUDIM_DEFAULT_DATA !== "undefined" && OPUDIM_DEFAULT_DATA.auth) || {};
+        if (email === fallback.email && password === fallback.password) {
+          sessionStorage.setItem("admin_logged", "true");
+          sessionStorage.setItem("admin_email", email);
+          sessionStorage.setItem("admin_password", password);
+          location.href = "index.html";
+          return;
+        }
+        err.textContent = ex.message || "Não foi possível entrar. Confira MySQL / config.local.php.";
+        err.style.display = "block";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
