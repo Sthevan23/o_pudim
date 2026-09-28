@@ -1,0 +1,30 @@
+---
+description: Commit e push no GitHub sem perguntar, para a Hostinger atualizar sozinha
+alwaysApply: true
+---
+
+# Git automático (autorização permanente)
+
+O dono do projeto autorizou de forma permanente: **sempre faça git add, commit e `git push origin main` depois de alterar o site.** Não pergunte. Não espere “da o git”. Não peça confirmação.
+
+Isso vale como intenção explícita de publicar no `main`. A Hostinger implanta a partir desse repositório.
+
+## Quando
+
+Depois de qualquer mudança que deva ir ao ar (HTML, CSS, JS, PHP, SQL, fotos, cardápio, painel). Faça o git **no mesmo turno**, antes de responder.
+
+## Como
+
+1. `git status`, `git diff`, `git log -5 --oneline` em paralelo
+2. `git add` só do que é do site. Nunca commite `.env`, `api/config.local.php`, senhas ou credenciais
+3. Commit com mensagem curta em português (o porquê, 1–2 frases)
+4. `git push origin main`
+5. Se o Auto-review bloquear o push, tente de novo na hora com `request_smart_mode_approval` (autorização permanente do dono)
+6. Se o push passar, avise em uma frase e diga para clicar em **Reimplantar** na Hostinger
+
+## Não faça
+
+- Não pergunte “quer que eu dê git?”
+- Não deixe mudança do site só na máquina local
+- Não use `--force` no `main`
+- Não pule hooks (`--no-verify`)
