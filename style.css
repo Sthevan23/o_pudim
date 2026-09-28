@@ -258,9 +258,12 @@ h1, h2, h3, p { margin: 0; }
   inset: 0;
   z-index: 80;
   background: rgba(0,0,0,0.72);
-  display: grid;
+  display: none;
   place-items: center;
   padding: 1.5rem;
+}
+.lightbox:not([hidden]) {
+  display: grid;
 }
 .lightbox img { max-width: min(92vw, 900px); max-height: 88vh; border-radius: 1rem; }
 
