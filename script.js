@@ -114,6 +114,12 @@
       if (!product) return;
       PudimCart.add(product, 1);
       updateCartBadge();
+      const t = document.getElementById("site-toast");
+      if (t) {
+        t.classList.add("show");
+        clearTimeout(t._hide);
+        t._hide = setTimeout(() => t.classList.remove("show"), 1600);
+      }
       return;
     }
     const lite = e.target.closest("[data-lite]");
@@ -128,6 +134,20 @@
   const toggle = document.getElementById("nav-toggle");
   const menu = document.getElementById("nav-menu");
   toggle?.addEventListener("click", () => menu.classList.toggle("is-open"));
+  menu?.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => menu.classList.remove("is-open")));
+
+  const reveal = () => {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-in");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+  };
+  reveal();
 
   window.addEventListener("scroll", () => {
     document.getElementById("header")?.classList.toggle("header--scrolled", window.scrollY > 12);
