@@ -191,10 +191,6 @@
       bag.style.transform = "";
     });
   }
-  document.getElementById("gift-card-flip")?.addEventListener("click", (e) => {
-    e.currentTarget.classList.toggle("is-flipped");
-  });
-
   let natalQty = 1;
   const natalQtyEl = document.getElementById("natal-qty");
   const natalMinus = document.getElementById("natal-minus");

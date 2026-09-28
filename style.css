@@ -281,40 +281,84 @@ h1, h2, h3, p { margin: 0; }
   transition: transform 120ms linear;
 }
 .gift__shine { display: none; }
-.seed-card {
-  width: min(100%, 280px);
-  aspect-ratio: 1;
-  margin: 0 auto 0.4rem;
+.gift--seed { text-align: left; }
+.seed-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-secondary);
+  border: 1px solid var(--c-secondary);
+  border-radius: 999px;
+  padding: 0.38rem 0.8rem;
+  margin-bottom: 0.85rem;
+}
+.gift--seed h3 { margin-top: 0.2rem; }
+.seed-lead {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--c-primary);
+  margin-bottom: 1.1rem;
+}
+.seed-lead em {
+  font-style: italic;
+  color: var(--c-secondary);
+}
+.seed-steps {
+  list-style: none;
+  margin: 0;
   padding: 0;
-  border: 0;
-  background: transparent;
-  perspective: 1100px;
-  cursor: pointer;
-  display: block;
+  display: grid;
+  gap: 0.45rem;
 }
-.seed-card__inner {
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 720ms var(--ease);
+.seed-steps li {
+  background: color-mix(in srgb, var(--c-cream) 70%, #fff);
+  border-radius: 1rem;
+  padding: 0.7rem 0.85rem;
+  display: grid;
+  grid-template-columns: 2.1rem 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  text-align: left;
 }
-.seed-card.is-flipped .seed-card__inner { transform: rotateY(180deg); }
-.seed-card__face {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  backface-visibility: hidden;
+.seed-steps span {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-secondary);
+  margin-bottom: 0.15rem;
+}
+.seed-steps i {
+  color: var(--c-primary);
+  font-size: 1.1rem;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
   background: #fff;
-  border-radius: 1.1rem;
-  border: 1px solid var(--c-line);
-  box-shadow: 0 10px 24px rgba(90, 56, 37, 0.08);
-  padding: 0.55rem;
+  display: grid;
+  place-items: center;
 }
-.seed-card__face--back { transform: rotateY(180deg); }
+.seed-steps p {
+  font-size: 0.88rem;
+  line-height: 1.35;
+  color: var(--c-muted);
+}
+.seed-bloom {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--c-secondary);
+  margin: 1.1rem 0 0.55rem;
+}
+.seed-unmold {
+  font-size: 0.88rem;
+  color: var(--c-muted);
+}
 .natal__buy { display: flex; flex-wrap: wrap; align-items: center; gap: 0.9rem; margin-top: 0.55rem; }
 .qty {
   display: inline-flex;
