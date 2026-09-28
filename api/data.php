@@ -19,6 +19,7 @@ if (
   ($_SERVER['REQUEST_METHOD'] ?? '') === 'GET'
   && !isset($_GET['full'])
   && (($_GET['action'] ?? '') !== 'full')
+  && (($_GET['action'] ?? '') !== 'visits')
 ) {
   $catalogFile = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'catalog.json';
   if (is_file($catalogFile)) {
@@ -61,6 +62,19 @@ $action = $_GET['action'] ?? '';
 if ($method === 'GET') {
   $pdo = db_or_fail();
   $password = get_password_header();
+
+  if ($action === 'visits') {
+    $auth = pudim_get_auth($pdo);
+    $ok = $auth['password'] !== '' && hash_equals($auth['password'], (string) $password);
+    if (!$ok) json_out(['error' => 'Senha inválida'], 401);
+    header('Cache-Control: no-store');
+    try {
+      json_out(pudim_visit_stats($pdo));
+    } catch (Throwable $e) {
+      json_out(['error' => 'Falha ao ler visitas', 'detail' => $e->getMessage()], 500);
+    }
+  }
+
   $wantFull = isset($_GET['full']) || $action === 'full';
 
   try {

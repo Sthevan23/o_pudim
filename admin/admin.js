@@ -12,6 +12,9 @@ const imgSrc = (path) => {
   if (/^(https?:|data:|\/|\.\.\/)/i.test(src)) return src;
   return "../" + src.replace(/^\//, "");
 };
+const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+}[c]));
 const emptyHtml = (msg) => `<p class="empty">${msg}</p>`;
 
 const sidebar = document.getElementById("sidebar");
@@ -32,9 +35,18 @@ function showPage(id) {
   document.querySelectorAll(".admin-page").forEach((p) => p.classList.remove("active"));
   document.querySelectorAll(".sidebar__link").forEach((a) => a.classList.toggle("active", a.dataset.page === id));
   document.getElementById("page-" + id)?.classList.add("active");
-  const titles = { dashboard: "Dashboard", pedidos: "Pedidos", produtos: "Produtos", clientes: "Clientes", financeiro: "Financeiro", config: "Configurações" };
+  const titles = {
+    dashboard: "Dashboard",
+    analise: "Análise",
+    pedidos: "Pedidos",
+    produtos: "Produtos",
+    clientes: "Clientes",
+    financeiro: "Financeiro",
+    config: "Configurações",
+  };
   document.getElementById("page-title").textContent = titles[id] || "Painel";
   closeSidebar();
+  if (id === "analise") loadVisits();
 }
 
 function orderCard(o) {
@@ -42,18 +54,73 @@ function orderCard(o) {
     <article class="order-card">
       <div class="order-card__top">
         <div>
-          <strong>${o.number || "-"}</strong>
-          <div>${o.clientName || ""}</div>
-          <small>${o.clientWhatsapp || ""}</small>
+          <strong>${escapeHtml(o.number || "-")}</strong>
+          <div>${escapeHtml(o.clientName || "")}</div>
+          <small>${escapeHtml(o.clientWhatsapp || "")}</small>
         </div>
         <strong>${money(o.total)}</strong>
       </div>
-      <div>${(o.items || []).map((i) => `${i.qty}x ${i.name}`).join(" · ") || "Sem itens"}</div>
-      ${o.notes ? `<small>${o.notes}</small>` : ""}
-      <select data-status="${o.id}">
+      <div>${(o.items || []).map((i) => `${i.qty}x ${escapeHtml(i.name)}`).join(" · ") || "Sem itens"}</div>
+      ${o.notes ? `<small>${escapeHtml(o.notes)}</small>` : ""}
+      <select data-status="${escapeHtml(o.id)}">
         ${["novo","preparo","entrega","finalizado","cancelado"].map((s) => `<option value="${s}" ${o.status === s ? "selected" : ""}>${s}</option>`).join("")}
       </select>
     </article>`;
+}
+
+function setPreview(path) {
+  const img = document.getElementById("p-preview");
+  if (!img) return;
+  if (!path) {
+    img.hidden = true;
+    img.removeAttribute("src");
+    return;
+  }
+  img.hidden = false;
+  img.src = imgSrc(path);
+}
+
+function fillVisitStats(s) {
+  const n = (v) => String(Number(v || 0));
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+  set("stat-visitors-today", n(s?.visitorsToday));
+  set("stat-views-today", n(s?.viewsToday));
+  set("an-visitors-today", n(s?.visitorsToday));
+  set("an-views-today", n(s?.viewsToday));
+  set("an-visitors-7d", n(s?.visitors7d));
+  set("an-views-7d", n(s?.views7d));
+  set("an-visitors-total", n(s?.visitorsTotal));
+  set("an-views-total", n(s?.viewsTotal));
+
+  const days = Array.isArray(s?.days) ? s.days : [];
+  const max = Math.max(1, ...days.map((d) => Number(d.visitors || 0)));
+  const fmt = (iso) => {
+    const parts = String(iso || "").split("-");
+    return parts[2] && parts[1] ? `${parts[2]}/${parts[1]}` : iso;
+  };
+  const tbody = document.getElementById("visits-days");
+  if (!tbody) return;
+  tbody.innerHTML = days.map((d) => {
+    const people = Number(d.visitors || 0);
+    const pct = Math.round((people / max) * 100);
+    return `<tr>
+      <td>${fmt(d.date)}</td>
+      <td>${people}</td>
+      <td>${Number(d.views || 0)}</td>
+      <td><div class="visit-bar"><span style="width:${pct}%"></span></div></td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="4">Ainda sem visitas registradas.</td></tr>`;
+}
+
+async function loadVisits() {
+  try {
+    fillVisitStats(await Storage.getVisitStatsAsync());
+  } catch {
+    fillVisitStats(null);
+  }
 }
 
 function renderAll() {
@@ -70,24 +137,32 @@ function renderAll() {
   document.getElementById("dash-orders").innerHTML = orders.slice(0, 5).map(orderCard).join("") || emptyHtml("Nenhum pedido ainda.");
   document.getElementById("orders-body").innerHTML = orders.map(orderCard).join("") || emptyHtml("Nenhum pedido ainda.");
 
-  document.getElementById("products-body").innerHTML = products.map((p) => `
-    <article class="product-card">
-      <img src="${imgSrc(p.image)}" alt="${p.name || ""}">
-      <h3>${p.name || ""}</h3>
-      <p>${p.description || ""}</p>
-      <div class="product-card__meta">
-        <span>${Storage.categoryName(p.categoryId)} · ${money(Storage.productDisplayPrice(p))}</span>
-        <span class="badge ${p.active === false ? "badge--off" : "badge--on"}">${p.active === false ? "oculto" : "visível"}</span>
-      </div>
-      <div class="product-card__actions">
-        <button class="btn btn--secondary btn--sm" data-edit="${p.id}">Editar</button>
-        <button class="btn btn--secondary btn--sm" data-toggle="${p.id}">${p.active === false ? "Mostrar" : "Ocultar"}</button>
-        <button class="btn btn--danger btn--sm" data-del="${p.id}">Excluir</button>
-      </div>
-    </article>`).join("") || emptyHtml("Nenhum produto cadastrado.");
+  document.getElementById("products-body").innerHTML = products.map((p) => {
+    const onMenu = p.active !== false;
+    const legend = String(p.description || "").trim();
+    return `
+    <tr class="${onMenu ? "" : "row--off-menu"}">
+      <td>
+        <button type="button" class="btn-onsite ${onMenu ? "is-on" : "is-off"}" data-toggle="${escapeHtml(p.id)}" title="${onMenu ? "Ocultar do site" : "Mostrar no site"}">
+          ${onMenu ? "✓ No site" : "✗ Fora"}
+        </button>
+      </td>
+      <td><img class="prod-thumb" src="${imgSrc(p.image)}" alt=""></td>
+      <td><strong>${escapeHtml(p.name || "")}</strong></td>
+      <td><span class="prod-legend">${legend ? escapeHtml(legend) : "—"}</span></td>
+      <td>${escapeHtml(Storage.categoryName(p.categoryId))}</td>
+      <td>${money(Storage.productDisplayPrice(p))}</td>
+      <td>
+        <div class="table__actions">
+          <button class="btn btn--secondary btn--sm" data-edit="${escapeHtml(p.id)}">Editar</button>
+          <button class="btn btn--danger btn--sm" data-del="${escapeHtml(p.id)}">Excluir</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="7">Nenhum produto cadastrado.</td></tr>`;
 
-  document.getElementById("clients-body").innerHTML = clients.map((c) => `<tr><td>${c.name}</td><td>${c.phone || ""}</td><td>${c.email || ""}</td></tr>`).join("") || `<tr><td colspan="3">Nenhum cliente ainda.</td></tr>`;
-  document.getElementById("finance-body").innerHTML = finance.map((f) => `<tr><td>${f.date || ""}</td><td>${f.type}</td><td>${f.description || ""}</td><td>${money(f.amount)}</td></tr>`).join("") || `<tr><td colspan="4">Sem lançamentos.</td></tr>`;
+  document.getElementById("clients-body").innerHTML = clients.map((c) => `<tr><td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.phone || "")}</td><td>${escapeHtml(c.email || "")}</td></tr>`).join("") || `<tr><td colspan="3">Nenhum cliente ainda.</td></tr>`;
+  document.getElementById("finance-body").innerHTML = finance.map((f) => `<tr><td>${escapeHtml(f.date || "")}</td><td>${escapeHtml(f.type)}</td><td>${escapeHtml(f.description || "")}</td><td>${money(f.amount)}</td></tr>`).join("") || `<tr><td colspan="4">Sem lançamentos.</td></tr>`;
 
   const s = Storage.getSettings();
   document.getElementById("s-name").value = s.name || "";
@@ -101,7 +176,7 @@ function renderAll() {
   document.getElementById("s-t3").value = s.sobreText3 || "";
   document.getElementById("s-hide").checked = s.hidePrices !== false;
   document.getElementById("s-natal").checked = s.showNatal !== false;
-  document.getElementById("p-cat").innerHTML = Storage.getCategories().map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+  document.getElementById("p-cat").innerHTML = Storage.getCategories().map((c) => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
 }
 
 function openProduct(product) {
@@ -113,6 +188,8 @@ function openProduct(product) {
   document.getElementById("p-cat").value = product?.categoryId || Storage.getCategories()[0]?.id || "";
   document.getElementById("p-active").checked = product?.active !== false;
   document.getElementById("p-feat").checked = !!product?.featured;
+  document.getElementById("p-file").value = "";
+  setPreview(product?.image || "");
   document.getElementById("modal-title").textContent = product ? "Editar produto" : "Novo produto";
   document.getElementById("product-modal").classList.add("active");
 }
@@ -133,6 +210,15 @@ document.getElementById("product-modal").addEventListener("click", (e) => {
   if (e.target.id === "product-modal") e.target.classList.remove("active");
 });
 document.getElementById("admin-email").textContent = sessionStorage.getItem("admin_email") || "";
+
+document.getElementById("publish-catalog")?.addEventListener("click", async () => {
+  try {
+    await Storage.publishCatalogAsync();
+    toast("Cardápio publicado no site");
+  } catch (err) {
+    toast(err.message || "Falha ao publicar");
+  }
+});
 
 document.getElementById("products-body").addEventListener("click", async (e) => {
   const edit = e.target.closest("[data-edit]");
@@ -172,6 +258,7 @@ document.getElementById("p-file").addEventListener("change", async (e) => {
   try {
     const path = await Storage.uploadImage(file);
     document.getElementById("p-image").value = path;
+    setPreview(path);
     toast("Foto enviada");
   } catch (err) {
     toast(err.message || "Falha no upload");
@@ -180,10 +267,22 @@ document.getElementById("p-file").addEventListener("change", async (e) => {
 
 document.getElementById("product-form").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const name = document.getElementById("p-name").value.trim();
+  const description = document.getElementById("p-desc").value.trim();
+  if (!name) {
+    toast("Informe o nome do produto");
+    return;
+  }
+  if (!description) {
+    toast("Informe a legenda do produto");
+    return;
+  }
+  const existing = Storage.getAllProducts().find((p) => p.id === document.getElementById("p-id").value) || {};
   const product = {
+    ...existing,
     id: document.getElementById("p-id").value || undefined,
-    name: document.getElementById("p-name").value.trim(),
-    description: document.getElementById("p-desc").value.trim(),
+    name,
+    description,
     price: Number(document.getElementById("p-price").value || 0),
     image: document.getElementById("p-image").value.trim(),
     categoryId: document.getElementById("p-cat").value,
@@ -194,7 +293,7 @@ document.getElementById("product-form").addEventListener("submit", async (e) => 
     await Storage.saveProductAsync(product);
     document.getElementById("product-modal").classList.remove("active");
     renderAll();
-    toast("Produto salvo");
+    toast("Produto salvo no site");
   } catch (err) {
     toast(err.message || "Falha ao salvar produto");
   }
@@ -226,7 +325,10 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
   }
 });
 
-Storage.initCloud({ full: true }).then(renderAll).catch(() => {
+Storage.initCloud({ full: true }).then(() => {
+  renderAll();
+  loadVisits();
+}).catch(() => {
   renderAll();
   toast("Painel no modo local — confira o MySQL");
 });

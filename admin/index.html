@@ -8,7 +8,7 @@
   <link rel="icon" href="../products/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="admin.css?v=4">
+  <link rel="stylesheet" href="admin.css?v=5">
   <script>if (sessionStorage.getItem("admin_logged") !== "true") location.replace("login.html");</script>
 </head>
 <body>
@@ -17,6 +17,7 @@
     <div class="sidebar__header"><img src="../products/logo.png" alt=""> O! Pudim</div>
     <nav class="sidebar__nav">
       <a href="#" class="sidebar__link active" data-page="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</a>
+      <a href="#" class="sidebar__link" data-page="analise"><i class="fas fa-chart-bar"></i> Análise</a>
       <a href="#" class="sidebar__link" data-page="pedidos"><i class="fas fa-shopping-bag"></i> Pedidos</a>
       <a href="#" class="sidebar__link" data-page="produtos"><i class="fas fa-ice-cream"></i> Produtos</a>
       <a href="#" class="sidebar__link" data-page="clientes"><i class="fas fa-users"></i> Clientes</a>
@@ -42,9 +43,30 @@
         <div class="stat-card"><div class="stat-card__icon" style="background:#e8f5e9;color:#2e7d32"><i class="fas fa-dollar-sign"></i></div><div><span class="stat-card__label">Vendas</span><strong class="stat-card__value" id="stat-sales">R$ 0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#e3f2fd;color:#1565c0"><i class="fas fa-users"></i></div><div><span class="stat-card__label">Clientes</span><strong class="stat-card__value" id="stat-clients">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#fff3e0;color:#ef6c00"><i class="fas fa-ice-cream"></i></div><div><span class="stat-card__label">Produtos ativos</span><strong class="stat-card__value" id="stat-products">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#ede7f6;color:#5e35b1"><i class="fas fa-user"></i></div><div><span class="stat-card__label">Pessoas hoje</span><strong class="stat-card__value" id="stat-visitors-today">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#e0f7fa;color:#00838f"><i class="fas fa-eye"></i></div><div><span class="stat-card__label">Visitas hoje</span><strong class="stat-card__value" id="stat-views-today">0</strong></div></div>
       </div>
       <h2 class="section-title">Pedidos recentes</h2>
       <div class="order-list" id="dash-orders"></div>
+    </section>
+
+    <section class="admin-page" id="page-analise">
+      <p class="fin-note">Pessoas = visitantes únicos. Visitas = vezes que o site foi aberto. Recarregar rápido não duplica.</p>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-card__icon" style="background:#ede7f6;color:#5e35b1"><i class="fas fa-user"></i></div><div><span class="stat-card__label">Pessoas hoje</span><strong class="stat-card__value" id="an-visitors-today">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#e0f7fa;color:#00838f"><i class="fas fa-eye"></i></div><div><span class="stat-card__label">Visitas hoje</span><strong class="stat-card__value" id="an-views-today">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#e8f5e9;color:#2e7d32"><i class="fas fa-users"></i></div><div><span class="stat-card__label">Pessoas em 7 dias</span><strong class="stat-card__value" id="an-visitors-7d">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#fff3e0;color:#ef6c00"><i class="fas fa-chart-line"></i></div><div><span class="stat-card__label">Visitas em 7 dias</span><strong class="stat-card__value" id="an-views-7d">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#fce4ec;color:#c2185b"><i class="fas fa-heart"></i></div><div><span class="stat-card__label">Pessoas no total</span><strong class="stat-card__value" id="an-visitors-total">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#f5e6d3;color:#5a3825"><i class="fas fa-globe"></i></div><div><span class="stat-card__label">Visitas no total</span><strong class="stat-card__value" id="an-views-total">0</strong></div></div>
+      </div>
+      <h2 class="section-title">Últimos 7 dias</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Dia</th><th>Pessoas</th><th>Visitas</th><th></th></tr></thead>
+          <tbody id="visits-days"></tbody>
+        </table>
+      </div>
     </section>
 
     <section class="admin-page" id="page-pedidos">
@@ -52,11 +74,30 @@
     </section>
 
     <section class="admin-page" id="page-produtos">
+      <p class="fin-note">Edite o <strong>nome</strong> e a <strong>legenda</strong> de cada produto. Use <strong>✓ No site</strong> / <strong>✗ Fora</strong> para mostrar ou esconder no cardápio.</p>
       <div class="toolbar">
         <h2 class="section-title" style="margin:0">Cardápio</h2>
-        <button class="btn btn--primary" id="new-product"><i class="fas fa-plus"></i> Novo produto</button>
+        <div class="toolbar__actions">
+          <button class="btn btn--secondary" type="button" id="publish-catalog"><i class="fas fa-cloud-upload-alt"></i> Publicar no site</button>
+          <button class="btn btn--primary" id="new-product"><i class="fas fa-plus"></i> Novo produto</button>
+        </div>
       </div>
-      <div class="product-grid" id="products-body"></div>
+      <div class="table-wrap">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>No cardápio</th>
+              <th>Foto</th>
+              <th>Nome</th>
+              <th>Legenda</th>
+              <th>Categoria</th>
+              <th>Preço</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="products-body"></tbody>
+        </table>
+      </div>
     </section>
 
     <section class="admin-page" id="page-clientes">
@@ -93,12 +134,17 @@
       <form id="product-form">
         <input type="hidden" id="p-id">
         <div class="form-grid">
-          <div class="form-group"><label>Nome</label><input id="p-name" required></div>
+          <div class="form-group"><label>Nome</label><input id="p-name" required placeholder="Ex.: Pudim Tradicional"></div>
           <div class="form-group"><label>Categoria</label><select id="p-cat"></select></div>
-          <div class="form-group full"><label>Descrição</label><textarea id="p-desc" rows="3"></textarea></div>
-          <div class="form-group"><label>Preço</label><input id="p-price" type="number" step="0.01"></div>
-          <div class="form-group"><label>Foto</label><input id="p-image" placeholder="products/..."></div>
-          <div class="form-group full"><label>Enviar foto</label><input id="p-file" type="file" accept="image/*"></div>
+          <div class="form-group full"><label>Legenda (texto do cardápio)</label><textarea id="p-desc" rows="3" required placeholder="Texto que o cliente lê no site"></textarea></div>
+          <div class="form-group"><label>Preço</label><input id="p-price" type="number" step="0.01" min="0"></div>
+          <div class="form-group"><label>Caminho da foto</label><input id="p-image" placeholder="products/..."></div>
+          <div class="form-group full">
+            <label>Enviar foto</label>
+            <input id="p-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp">
+            <small class="field-hint">JPG ou PNG. A foto aparece no cardápio depois de salvar.</small>
+            <img id="p-preview" class="prod-photo-preview" alt="Prévia" hidden>
+          </div>
           <div class="form-group"><label><input type="checkbox" id="p-active" checked> Visível no site</label></div>
           <div class="form-group"><label><input type="checkbox" id="p-feat"> Destaque</label></div>
         </div>
@@ -112,7 +158,7 @@
   <div class="toast" id="toast"></div>
 
   <script src="../js/default-data.js?v=6"></script>
-  <script src="../js/storage.js?v=2"></script>
-  <script src="admin.js?v=7"></script>
+  <script src="../js/storage.js?v=3"></script>
+  <script src="admin.js?v=8"></script>
 </body>
 </html>

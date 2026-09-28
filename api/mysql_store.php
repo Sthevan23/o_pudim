@@ -552,6 +552,102 @@ function pudim_create_order(PDO $pdo, array $order, ?array $client = null): arra
   return ['ok' => true, 'id' => $id, 'number' => $number, 'total' => $total];
 }
 
+function pudim_ensure_visits(PDO $pdo): void {
+  static $done = false;
+  if ($done) return;
+  $done = true;
+  if (pudim_table_exists($pdo, 'visits')) return;
+  try {
+    $pdo->exec(
+      'CREATE TABLE visits (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        session_id VARCHAR(64) NOT NULL,
+        path VARCHAR(190) NOT NULL DEFAULT "/",
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_visits_created (created_at),
+        KEY idx_visits_session (session_id, created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+  } catch (Throwable $e) { /* já existe ou sem permissão */ }
+}
+
+function pudim_record_visit(PDO $pdo, string $sessionId, string $path): void {
+  pudim_ensure_visits($pdo);
+  if (!pudim_table_exists($pdo, 'visits')) return;
+  $sessionId = substr(preg_replace('/[^a-zA-Z0-9_-]/', '', $sessionId), 0, 64);
+  if (strlen($sessionId) < 8) return;
+  $path = substr(trim($path) !== '' ? $path : '/', 0, 190);
+  if (preg_match('#/admin(/|$)#i', $path)) return;
+
+  $tz = new DateTimeZone('America/Sao_Paulo');
+  $now = new DateTime('now', $tz);
+  $since = (clone $now)->modify('-30 seconds')->format('Y-m-d H:i:s');
+  $dup = $pdo->prepare('SELECT 1 FROM visits WHERE session_id = ? AND created_at >= ? LIMIT 1');
+  $dup->execute([$sessionId, $since]);
+  if ($dup->fetchColumn()) return;
+
+  $ins = $pdo->prepare('INSERT INTO visits (session_id, path, created_at) VALUES (?, ?, ?)');
+  $ins->execute([$sessionId, $path, $now->format('Y-m-d H:i:s')]);
+}
+
+function pudim_visit_stats(PDO $pdo): array {
+  pudim_ensure_visits($pdo);
+  $tz = new DateTimeZone('America/Sao_Paulo');
+  $today = new DateTime('today', $tz);
+  $emptyDays = [];
+  for ($i = 6; $i >= 0; $i--) {
+    $d = (clone $today)->modify('-' . $i . ' days')->format('Y-m-d');
+    $emptyDays[$d] = ['date' => $d, 'views' => 0, 'visitors' => 0];
+  }
+  $zero = [
+    'visitorsToday' => 0,
+    'viewsToday' => 0,
+    'visitors7d' => 0,
+    'views7d' => 0,
+    'visitorsTotal' => 0,
+    'viewsTotal' => 0,
+    'days' => array_values($emptyDays),
+  ];
+  if (!pudim_table_exists($pdo, 'visits')) return $zero;
+
+  $todayStart = $today->format('Y-m-d 00:00:00');
+  $weekStart = (clone $today)->modify('-6 days')->format('Y-m-d 00:00:00');
+
+  $run = static function (PDO $pdo, string $sql, array $params = []): array {
+    $st = $pdo->prepare($sql);
+    $st->execute($params);
+    return $st->fetch() ?: [];
+  };
+
+  $todayRow = $run($pdo, 'SELECT COUNT(*) AS views, COUNT(DISTINCT session_id) AS visitors FROM visits WHERE created_at >= ?', [$todayStart]);
+  $weekRow = $run($pdo, 'SELECT COUNT(*) AS views, COUNT(DISTINCT session_id) AS visitors FROM visits WHERE created_at >= ?', [$weekStart]);
+  $allRow = $run($pdo, 'SELECT COUNT(*) AS views, COUNT(DISTINCT session_id) AS visitors FROM visits');
+
+  $st = $pdo->prepare(
+    'SELECT DATE(created_at) AS d, COUNT(*) AS views, COUNT(DISTINCT session_id) AS visitors
+     FROM visits WHERE created_at >= ? GROUP BY DATE(created_at)'
+  );
+  $st->execute([$weekStart]);
+  while ($row = $st->fetch()) {
+    $d = (string) ($row['d'] ?? '');
+    if (isset($emptyDays[$d])) {
+      $emptyDays[$d]['views'] = (int) $row['views'];
+      $emptyDays[$d]['visitors'] = (int) $row['visitors'];
+    }
+  }
+
+  return [
+    'visitorsToday' => (int) ($todayRow['visitors'] ?? 0),
+    'viewsToday' => (int) ($todayRow['views'] ?? 0),
+    'visitors7d' => (int) ($weekRow['visitors'] ?? 0),
+    'views7d' => (int) ($weekRow['views'] ?? 0),
+    'visitorsTotal' => (int) ($allRow['visitors'] ?? 0),
+    'viewsTotal' => (int) ($allRow['views'] ?? 0),
+    'days' => array_values($emptyDays),
+  ];
+}
+
 function pudim_save_data_url_file(string $dataUrl): string {
   if (!preg_match('#^data:(image/(jpeg|png|webp|gif));base64,(.+)$#s', $dataUrl, $m)) {
     return '';

@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS `reviews`;
 DROP TABLE IF EXISTS `settings`;
 DROP TABLE IF EXISTS `admins`;
 DROP TABLE IF EXISTS `product_images`;
+DROP TABLE IF EXISTS `visits`;
 
 CREATE TABLE `admins` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -186,6 +187,16 @@ CREATE TABLE `product_images` (
   PRIMARY KEY (`filename`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `visits` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `session_id` VARCHAR(64) NOT NULL,
+  `path` VARCHAR(190) NOT NULL DEFAULT '/',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_visits_created` (`created_at`),
+  KEY `idx_visits_session` (`session_id`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT INTO `admins` (`email`, `password_hash`) VALUES ('ana@pudins.com', 'pudim123');
 
 INSERT INTO `settings` (
@@ -264,6 +275,15 @@ INSERT INTO `reviews` (`id`, `author`, `text`, `rating`) VALUES
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Se o banco já foi importado, rode só isto no phpMyAdmin:
+-- CREATE TABLE IF NOT EXISTS `visits` (
+--   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `session_id` VARCHAR(64) NOT NULL,
+--   `path` VARCHAR(190) NOT NULL DEFAULT '/',
+--   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`id`),
+--   KEY `idx_visits_created` (`created_at`),
+--   KEY `idx_visits_session` (`session_id`, `created_at`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 -- INSERT IGNORE INTO `categories` (`id`, `name`, `slug`, `sort_order`) VALUES ('cat-copo', 'Copos', 'copos', 0);
 -- INSERT IGNORE INTO `products` (`id`, `name`, `description`, `price`, `category_id`, `image`, `featured`, `slug`, `promo_active`, `promo_price`, `best_seller`, `active`, `sort_order`) VALUES
 -- ('p-joao', 'Que Ele cresça', 'Copo especial com a mensagem de João 3:30. Cremoso, com calda de caramelo e tampa dourada.', 12.00, 'cat-copo', 'products/joao-330.png', 1, 'que-ele-cresca', 0, NULL, 1, 1, 0),

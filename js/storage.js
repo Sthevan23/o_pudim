@@ -189,6 +189,45 @@ const Storage = (() => {
     return data.path;
   }
 
+  async function publishCatalogAsync() {
+    return postAction({ action: 'publish_catalog', password: adminPassword() });
+  }
+
+  async function getVisitStatsAsync() {
+    const sep = API.includes('?') ? '&' : '?';
+    return fetchJson(API + sep + 'action=visits', {
+      headers: { 'X-Admin-Password': adminPassword() },
+    });
+  }
+
+  function pingVisit() {
+    if (/\/admin\//.test(location.pathname || '')) return;
+    try {
+      const key = 'opudim_vid';
+      let id = localStorage.getItem(key);
+      if (!id) {
+        id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : (Date.now().toString(36) + Math.random().toString(36).slice(2, 12));
+        localStorage.setItem(key, id);
+      }
+      const visitUrl = API.replace(/data\.php(?:\?.*)?$/, 'visit.php');
+      fetch(visitUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session: id,
+          path: (location.pathname || '/') + (location.search || '') + (location.hash || ''),
+        }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch { /* ignore */ }
+  }
+
+  if (!/\/admin\//.test(location.pathname || '')) {
+    setTimeout(pingVisit, 500);
+  }
+
   function getSettings() { return getData().settings || {}; }
   function getProducts() { return (getData().products || []).filter((p) => p && p.active !== false); }
   function getAllProducts() { return getData().products || []; }
@@ -217,7 +256,8 @@ const Storage = (() => {
   return {
     API, loadCatalog, loginAsync, initCloud, saveProductAsync, deleteProductAsync,
     setProductActiveAsync, saveAllAsync, createOrderAsync, setOrderStatusAsync,
-    uploadImage, getData, getSettings, getProducts, getAllProducts, getCategories,
+    uploadImage, publishCatalogAsync, getVisitStatsAsync, pingVisit,
+    getData, getSettings, getProducts, getAllProducts, getCategories,
     getGallery, getReviews, getOrders, getClients, getFinance, isCloudEnabled,
     productDisplayPrice, categoryName, waLink, setMemory, getDataStore: getData,
   };
