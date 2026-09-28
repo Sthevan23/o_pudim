@@ -288,7 +288,7 @@ function pudim_public_payload(array $data): array {
     }
     $products[] = $item;
   }
-  return [
+  $payload = [
     'version' => $data['version'] ?? 1,
     'settings' => $data['settings'] ?? new stdClass(),
     'categories' => $data['categories'] ?? [],
@@ -296,6 +296,10 @@ function pudim_public_payload(array $data): array {
     'reviews' => $data['reviews'] ?? [],
     'gallery' => $data['gallery'] ?? [],
   ];
+  if (!empty($data['partners']) && is_array($data['partners'])) {
+    $payload['partners'] = $data['partners'];
+  }
+  return $payload;
 }
 
 function pudim_write_public_catalog(PDO $pdo): bool {

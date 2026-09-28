@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
   <header class="header" id="header">
@@ -125,14 +125,50 @@
       </div>
     </section>
 
-    <section class="section partners reveal" id="parceiros">
+    <section class="section partners reveal is-in" id="parceiros">
       <div class="container">
         <p class="eyebrow">Onde encontrar</p>
-        <h2 class="section__title">Nossos produtos estão disponíveis em nossos parceiros</h2>
-        <h3 class="partners__group">Pudins</h3>
-        <div class="partners__grid" id="partners-pudins"></div>
-        <h3 class="partners__group">Picolés, IceDim e Gelatos</h3>
-        <div class="partners__grid" id="partners-gelatos"></div>
+        <h2 class="section__title">Parceiros da casa</h2>
+        <p class="section__lead">A O! Pudim está em restaurantes, supermercados e casas de Lagoa da Prata. Procure pelo copo com a tampa dourada.</p>
+        <p class="partners__city"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Lagoa da Prata — MG</p>
+
+        <div class="partners__panels">
+          <article class="partners__panel">
+            <p class="partners__badge">Pudins</p>
+            <h3>Onde achar nossos pudins</h3>
+            <p class="partners__hint">Marcas e pontos oficiais</p>
+            <div class="partners__logos" id="partners-pudins-logos">
+              <article class="partner-card"><img src="products/partners/taioba.png" alt="Restaurante do Taioba" loading="lazy"><p>Restaurante do Taioba</p></article>
+              <article class="partner-card"><img src="products/partners/joaozinho.png" alt="Supermercados Joãozinho" loading="lazy"><p>Joãozinho</p></article>
+              <article class="partner-card"><img src="products/partners/temmax.png" alt="Supermercado Temmax" loading="lazy"><p>Temmax</p></article>
+              <article class="partner-card"><img src="products/partners/meio-kilo.png" alt="Hamburgueria Meio Kilo" loading="lazy"><p>Meio Kilo</p></article>
+              <article class="partner-card"><img src="products/partners/express-7.png" alt=".7 Express" loading="lazy"><p>.7 Express</p></article>
+              <article class="partner-card"><img src="products/partners/laut.png" alt="Läut" loading="lazy"><p>Läut</p></article>
+            </div>
+            <p class="partners__also">Também em</p>
+            <ul class="partners__chips" id="partners-pudins-chips">
+              <li>Restaurante 2002</li>
+              <li>Restaurante Predileto</li>
+              <li>Restaurante Tia Maria</li>
+              <li>Restaurante Sabor de Casa</li>
+              <li>Kenko</li>
+              <li>Suki</li>
+              <li>Texas</li>
+              <li>Barracão Burguer</li>
+              <li>Arena LBS</li>
+            </ul>
+          </article>
+
+          <article class="partners__panel">
+            <p class="partners__badge">Picolés, IceDim e Gelatos</p>
+            <h3>Sabores gelados nestes pontos</h3>
+            <p class="partners__hint">Retire ou peça no local</p>
+            <div class="partners__logos partners__logos--few" id="partners-gelatos-logos">
+              <article class="partner-card"><img src="products/partners/taioba.png" alt="Restaurante do Taioba" loading="lazy"><p>Restaurante do Taioba</p></article>
+              <article class="partner-card"><img src="products/partners/express-7.png" alt=".7 Express" loading="lazy"><p>.7 Express</p></article>
+            </div>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -192,6 +228,6 @@
   <script src="js/default-data.js?v=6"></script>
   <script src="js/storage.js?v=2"></script>
   <script src="js/cart.js?v=1"></script>
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=11"></script>
 </body>
 </html>

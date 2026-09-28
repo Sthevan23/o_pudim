@@ -18,17 +18,28 @@
   }
 
   function partnerCard(partner) {
+    const name = partner.name || "";
     if (partner.logo) {
       return `
         <article class="partner-card">
-          <img src="${partner.logo}" alt="${partner.name}">
-          <p>${partner.name}</p>
+          <img src="${partner.logo}" alt="${name}" loading="lazy">
+          <p>${name}</p>
         </article>`;
     }
-    return `
-      <article class="partner-card partner-card--text">
-        <p>${partner.name}</p>
-      </article>`;
+    return `<li>${name}</li>`;
+  }
+
+  function fillPartners(list, logosId, chipsId) {
+    const items = list || [];
+    const logosEl = document.getElementById(logosId);
+    const chipsEl = chipsId ? document.getElementById(chipsId) : null;
+    if (logosEl) {
+      const logos = items.filter((p) => p.logo);
+      if (logos.length) logosEl.innerHTML = logos.map(partnerCard).join("");
+    }
+    if (chipsEl) {
+      chipsEl.innerHTML = items.filter((p) => !p.logo).map(partnerCard).join("");
+    }
   }
 
   function render() {
@@ -103,11 +114,11 @@
         </article>`).join("");
     }
 
-    const partners = (typeof OPUDIM_DEFAULT_DATA !== "undefined" && OPUDIM_DEFAULT_DATA.partners) || {};
-    const pudins = document.getElementById("partners-pudins");
-    if (pudins) pudins.innerHTML = (partners.pudins || []).map(partnerCard).join("");
-    const gelatos = document.getElementById("partners-gelatos");
-    if (gelatos) gelatos.innerHTML = (partners.gelatos || []).map(partnerCard).join("");
+    const partners = (Storage.getData().partners && Storage.getData().partners.pudins)
+      ? Storage.getData().partners
+      : ((typeof OPUDIM_DEFAULT_DATA !== "undefined" && OPUDIM_DEFAULT_DATA.partners) || {});
+    fillPartners(partners.pudins, "partners-pudins-logos", "partners-pudins-chips");
+    fillPartners(partners.gelatos, "partners-gelatos-logos", null);
 
     const natalOn = settings.showNatal !== false;
     const natalSec = document.getElementById("natal");
