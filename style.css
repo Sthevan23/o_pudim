@@ -242,57 +242,45 @@ h1, h2, h3, p { margin: 0; }
 }
 .gift p { color: var(--c-muted); font-size: 0.92rem; }
 .gift--bag {
-  background:
-    radial-gradient(ellipse 90% 70% at 50% 18%, #4a2e1d 0%, #1d120d 58%, #120b08 100%);
-  color: #f7efe6;
+  background: #fff;
+  color: inherit;
 }
-.gift--bag h3 { color: #f7efe6; }
-.gift--bag p { color: #d9c4b2; }
+.gift--bag h3 { color: var(--c-primary); }
+.gift--bag p { color: var(--c-muted); }
 .gift__stage {
   position: relative;
-  min-height: 17.5rem;
+  min-height: 18rem;
   display: grid;
   place-items: center;
   perspective: 900px;
   overflow: hidden;
   border-radius: 1.2rem;
   background:
-    radial-gradient(ellipse 60% 48% at 50% 40%, #7a4d30 0%, #3a2418 42%, #120b08 78%);
+    radial-gradient(ellipse 70% 55% at 50% 80%, rgba(90, 56, 37, 0.1), transparent 62%),
+    #fff;
 }
-.gift--bag .gift__stage {
-  background: transparent;
-}
+.gift--bag .gift__stage { background: #fff; }
 .gift__glow {
   position: absolute;
-  width: 11rem;
-  height: 2.4rem;
-  bottom: 1.2rem;
+  width: 10rem;
+  height: 1.8rem;
+  bottom: 1.1rem;
   left: 50%;
   transform: translateX(-50%);
-  background: radial-gradient(ellipse, rgba(197, 139, 92, 0.5), transparent 72%);
-  filter: blur(8px);
+  background: radial-gradient(ellipse, rgba(90, 56, 37, 0.2), transparent 72%);
+  filter: blur(7px);
   animation: bagShadow 4.2s ease-in-out infinite;
 }
 .gift__bag {
-  width: min(86%, 300px);
+  width: min(78%, 260px);
   position: relative;
   z-index: 1;
   transform-style: preserve-3d;
   animation: bagFloat 4.2s ease-in-out infinite;
-  filter: drop-shadow(0 20px 22px rgba(0, 0, 0, 0.45));
   will-change: transform;
   transition: transform 120ms linear;
 }
-.gift__shine {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background: linear-gradient(115deg, transparent 36%, rgba(255,236,210,0.28) 50%, transparent 64%);
-  background-size: 220% 100%;
-  animation: bagShine 4.8s ease-in-out infinite;
-  mix-blend-mode: screen;
-}
+.gift__shine { display: none; }
 .seed-card {
   width: min(100%, 280px);
   aspect-ratio: 1;
