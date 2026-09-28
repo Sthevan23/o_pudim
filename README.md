@@ -17,7 +17,7 @@ Site + painel admin para Hostinger (HTML/CSS/JS + PHP + MySQL). Sem Node.
 1. No hPanel, crie um banco MySQL (anote usuário, senha e nome).
 2. phpMyAdmin → SQL → importe `api/o_pudim_mysql.sql`.
 3. Copie `api/config.local.example.php` para `api/config.local.php` e preencha a senha.
-4. Envie **esta pasta** para `public_html` (zip pequeno, sem `node_modules`).
+4. Envie **esta pasta** para `public_html`.
 5. Teste: `seusite.com/api/ping.php`
 
 Painel: `seusite.com/admin/login.html`

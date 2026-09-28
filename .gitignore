@@ -4,5 +4,3 @@ api/config.local.php
 Thumbs.db
 .vscode
 node_modules
-backend/
-frontend/
