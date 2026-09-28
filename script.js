@@ -69,7 +69,7 @@
     const year = document.getElementById("year");
     if (year) year.textContent = String(new Date().getFullYear());
 
-    ["nav-wa", "hero-wa", "contact-wa", "wa-float"].forEach((id) => {
+    ["nav-wa", "contact-wa", "wa-float"].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.href = wa(settings.whatsappMessage);
     });
