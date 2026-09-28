@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=13">
 </head>
 <body>
   <header class="header" id="header">
@@ -71,7 +71,6 @@
               <li><strong>Confirmação dos pedidos:</strong> 20/12/2026</li>
               <li><strong>WhatsApp:</strong> (37) 99119-4019</li>
             </ul>
-            <p>Um presente completo para o Natal. Seu pudim será acomodado em uma bag térmica presenteável, reutilizável e resistente, com capacidade para até 14 kg. Acompanha nosso cartão de papel-semente, que pode ser plantado e transformado em vida.</p>
             <p>Mais que uma sobremesa: um presente feito com carinho, fé e propósito pela O! Pudim.</p>
             <div class="natal__buy">
               <div class="qty" role="group" aria-label="Quantidade">
@@ -82,6 +81,30 @@
               <button class="btn btn--primary" type="button" id="natal-add">Adicionar à reserva</button>
             </div>
           </div>
+        </div>
+
+        <p class="natal__gifts-kicker">Incluso em cada reserva</p>
+        <div class="natal__gifts">
+          <article class="gift">
+            <div class="gift__stage" id="gift-bag-stage">
+              <span class="gift__glow" aria-hidden="true"></span>
+              <img class="gift__bag" id="gift-bag" src="products/sacola-termica.png" alt="Bag térmica presenteável O! Pudim">
+              <span class="gift__shine" aria-hidden="true"></span>
+            </div>
+            <h3>Bag térmica presenteável</h3>
+            <p>Reutilizável e resistente, com capacidade para até 14 kg. Seu pudim chega acomodado como um presente.</p>
+          </article>
+
+          <article class="gift">
+            <button type="button" class="seed-card" id="gift-card-flip" aria-label="Virar o cartão de agradecimento">
+              <span class="seed-card__inner">
+                <img class="seed-card__face seed-card__face--front" src="products/cartao-agradecimento-1.png" alt="Cartão O! Pudim: não é lixo, é vida">
+                <img class="seed-card__face seed-card__face--back" src="products/cartao-agradecimento-2.png" alt="Como plantar o cartão de papel-semente">
+              </span>
+            </button>
+            <h3>Cartão de papel-semente</h3>
+            <p>Não é lixo. É vida! Depois de saborear, rasgue, plante e em poucas semanas a natureza floresce. Toque no cartão para ver o passo a passo.</p>
+          </article>
         </div>
       </div>
     </section>
@@ -228,6 +251,6 @@
   <script src="js/default-data.js?v=6"></script>
   <script src="js/storage.js?v=2"></script>
   <script src="js/cart.js?v=1"></script>
-  <script src="script.js?v=12"></script>
+  <script src="script.js?v=13"></script>
 </body>
 </html>

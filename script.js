@@ -176,6 +176,25 @@
 
   Storage.loadCatalog().then(render).catch(render);
 
+  const bagStage = document.getElementById("gift-bag-stage");
+  const bag = document.getElementById("gift-bag");
+  if (bagStage && bag && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    bagStage.addEventListener("mousemove", (e) => {
+      const r = bagStage.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      bag.style.animation = "none";
+      bag.style.transform = `rotateY(${x * 28}deg) rotateX(${-y * 14}deg) translateY(-10px)`;
+    });
+    bagStage.addEventListener("mouseleave", () => {
+      bag.style.animation = "";
+      bag.style.transform = "";
+    });
+  }
+  document.getElementById("gift-card-flip")?.addEventListener("click", (e) => {
+    e.currentTarget.classList.toggle("is-flipped");
+  });
+
   let natalQty = 1;
   const natalQtyEl = document.getElementById("natal-qty");
   const natalMinus = document.getElementById("natal-minus");

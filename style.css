@@ -213,6 +213,111 @@ h1, h2, h3, p { margin: 0; }
 .natal__facts li { color: var(--c-muted); font-size: 0.95rem; }
 .natal__facts strong { color: var(--c-primary); font-weight: 700; }
 .natal__info > p { color: var(--c-muted); }
+.natal__gifts-kicker {
+  margin: 2.4rem 0 1.1rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-secondary);
+  text-align: center;
+}
+.natal__gifts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  align-items: stretch;
+}
+.gift {
+  background: #fff;
+  border-radius: 1.6rem;
+  padding: 1.2rem 1.2rem 1.35rem;
+  box-shadow: 0 14px 32px rgba(90, 56, 37, 0.07);
+  text-align: center;
+}
+.gift h3 {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  margin: 0.35rem 0 0.4rem;
+}
+.gift p { color: var(--c-muted); font-size: 0.92rem; }
+.gift__stage {
+  position: relative;
+  min-height: 16.5rem;
+  display: grid;
+  place-items: center;
+  perspective: 900px;
+  overflow: hidden;
+  border-radius: 1.2rem;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 88%, rgba(90, 56, 37, 0.12), transparent 62%),
+    color-mix(in srgb, var(--c-cream) 55%, #fff);
+}
+.gift__glow {
+  position: absolute;
+  width: 9rem;
+  height: 2.2rem;
+  bottom: 1.35rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, rgba(90, 56, 37, 0.28), transparent 70%);
+  filter: blur(6px);
+  animation: bagShadow 4.2s ease-in-out infinite;
+}
+.gift__bag {
+  width: min(72%, 240px);
+  position: relative;
+  z-index: 1;
+  transform-style: preserve-3d;
+  animation: bagFloat 4.2s ease-in-out infinite;
+  filter: drop-shadow(0 18px 16px rgba(90, 56, 37, 0.18));
+  will-change: transform;
+  transition: transform 120ms linear;
+}
+.gift__shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 36%, rgba(255,255,255,0.55) 50%, transparent 64%);
+  background-size: 220% 100%;
+  animation: bagShine 4.8s ease-in-out infinite;
+  mix-blend-mode: soft-light;
+}
+.seed-card {
+  width: min(100%, 280px);
+  aspect-ratio: 1;
+  margin: 0 auto 0.4rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  perspective: 1100px;
+  cursor: pointer;
+  display: block;
+}
+.seed-card__inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 720ms var(--ease);
+}
+.seed-card.is-flipped .seed-card__inner { transform: rotateY(180deg); }
+.seed-card__face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  backface-visibility: hidden;
+  background: #fff;
+  border-radius: 1.1rem;
+  border: 1px solid var(--c-line);
+  box-shadow: 0 10px 24px rgba(90, 56, 37, 0.08);
+  padding: 0.55rem;
+}
+.seed-card__face--back { transform: rotateY(180deg); }
 .natal__buy { display: flex; flex-wrap: wrap; align-items: center; gap: 0.9rem; margin-top: 0.55rem; }
 .qty {
   display: inline-flex;
@@ -547,10 +652,22 @@ label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--c-pri
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.06); }
 }
+@keyframes bagFloat {
+  0%, 100% { transform: translateY(0) rotateY(-9deg) rotateZ(-1.5deg); }
+  50% { transform: translateY(-16px) rotateY(9deg) rotateZ(1.5deg); }
+}
+@keyframes bagShadow {
+  0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.85; }
+  50% { transform: translateX(-50%) scaleX(0.78); opacity: 0.45; }
+}
+@keyframes bagShine {
+  0%, 28% { background-position: 140% 0; }
+  58%, 100% { background-position: -40% 0; }
+}
 
 @media (max-width: 900px) {
   :root { --header-h: 4rem; --container: min(1120px, calc(100% - 1.25rem)); }
-  .hero__grid, .about__grid, .reviews__grid, .diff__grid, .natal__grid, .cart-layout { grid-template-columns: 1fr; }
+  .hero__grid, .about__grid, .reviews__grid, .diff__grid, .natal__grid, .natal__gifts, .cart-layout { grid-template-columns: 1fr; }
   .products__grid, .bestsellers__grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
   .partners__panels { grid-template-columns: 1fr; }
   .partners__logos { grid-template-columns: repeat(3, 1fr); }
@@ -599,5 +716,5 @@ label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--c-pri
   .natal__buy .btn { flex: 1; min-width: 12rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .card, .wa-float, .admin-page { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
+  .reveal, .card, .wa-float, .admin-page, .gift__bag, .gift__glow, .gift__shine { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
 }
