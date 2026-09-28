@@ -47,6 +47,7 @@ CREATE TABLE `settings` (
   `sobre_text2` TEXT,
   `whatsapp_message` VARCHAR(255) DEFAULT NULL,
   `hide_prices` TINYINT(1) NOT NULL DEFAULT 1,
+  `show_natal` TINYINT(1) NOT NULL DEFAULT 1,
   `data_version` INT UNSIGNED NOT NULL DEFAULT 1,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -190,7 +191,7 @@ INSERT INTO `admins` (`email`, `password_hash`) VALUES ('ana@pudins.com', 'pudim
 INSERT INTO `settings` (
   `id`, `name`, `tagline`, `logo`, `banner`, `sobre_image`, `whatsapp`,
   `instagram`, `instagram_user`, `email`, `address`, `hours`, `hero_badge`,
-  `sobre_text1`, `sobre_text2`, `whatsapp_message`, `hide_prices`, `data_version`
+  `sobre_text1`, `sobre_text2`, `whatsapp_message`, `hide_prices`, `show_natal`, `data_version`
 ) VALUES (
   1,
   'O! Pudim',
@@ -208,6 +209,7 @@ INSERT INTO `settings` (
   'A O! Pudim nasceu em Lagoa da Prata, Minas Gerais, com fé, gratidão e o desejo de transformar doces momentos em experiências especiais. Em cada etapa, buscamos honrar a Deus com dedicação, cuidado e amor pelo que fazemos.',
   'Preparamos nossas receitas artesanalmente, com ingredientes selecionados e atenção a cada detalhe — do sabor à apresentação. Do pudim tradicional às criações da estação, cada delícia é feita para encantar, compartilhar e adoçar bons momentos. Que cada criação leve consigo um pouco do nosso carinho e da nossa fé. Para a honra e a glória de Deus.',
   'Olá! Gostaria de fazer um pedido.',
+  1,
   1,
   1
 );

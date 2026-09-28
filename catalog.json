@@ -18,7 +18,8 @@
     "sobreText2": "Preparamos nossas receitas artesanalmente, com ingredientes selecionados e atenção a cada detalhe — do sabor à apresentação. Do pudim tradicional às criações da estação, cada delícia é feita para encantar, compartilhar e adoçar bons momentos.",
     "sobreText3": "Que cada criação leve consigo um pouco do nosso carinho e da nossa fé. Para a honra e a glória de Deus.",
     "whatsappMessage": "Olá! Gostaria de fazer um pedido.",
-    "hidePrices": true
+    "hidePrices": true,
+    "showNatal": true
   },
   "categories": [
     { "id": "cat-copo", "name": "Copos", "slug": "copos" },

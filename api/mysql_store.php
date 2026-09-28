@@ -43,10 +43,27 @@ function pudim_map_product(array $row): array {
   ];
 }
 
+function pudim_ensure_show_natal(PDO $pdo): void {
+  static $done = false;
+  if ($done) return;
+  $done = true;
+  try {
+    $stmt = $pdo->prepare(
+      'SELECT 1 FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ? LIMIT 1'
+    );
+    $stmt->execute(['settings', 'show_natal']);
+    if (!$stmt->fetchColumn()) {
+      $pdo->exec('ALTER TABLE settings ADD COLUMN show_natal TINYINT(1) NOT NULL DEFAULT 1');
+    }
+  } catch (Throwable $e) { /* coluna já existe ou sem permissão */ }
+}
+
 function pudim_load_all(PDO $pdo, string $mode = 'full'): ?array {
   if (!pudim_db_ready($pdo)) {
     return null;
   }
+  pudim_ensure_show_natal($pdo);
 
   $settingsRow = $pdo->query('SELECT * FROM settings WHERE id = 1 LIMIT 1')->fetch();
   if (!$settingsRow) {
@@ -101,6 +118,7 @@ function pudim_load_all(PDO $pdo, string $mode = 'full'): ?array {
     'sobreText2' => $settingsRow['sobre_text2'] ?? '',
     'whatsappMessage' => $settingsRow['whatsapp_message'] ?? 'Olá! Gostaria de fazer um pedido.',
     'hidePrices' => ((int) ($settingsRow['hide_prices'] ?? 1)) === 1,
+    'showNatal' => array_key_exists('show_natal', $settingsRow) ? ((int) $settingsRow['show_natal'] === 1) : true,
   ];
 
   $base = [
@@ -212,6 +230,15 @@ function pudim_load_reservas(PDO $pdo): array {
 }
 
 function pudim_create_reserva(PDO $pdo, array $reserva): array {
+  pudim_ensure_show_natal($pdo);
+  try {
+    $show = $pdo->query('SELECT show_natal FROM settings WHERE id = 1 LIMIT 1')->fetchColumn();
+    if ($show !== false && (int) $show !== 1) {
+      throw new InvalidArgumentException('A reserva de Natal não está disponível no momento.');
+    }
+  } catch (InvalidArgumentException $e) {
+    throw $e;
+  } catch (Throwable $e) { /* coluna ainda não existe: reserva segue */ }
   if (!pudim_table_exists($pdo, 'reservas_natal')) {
     throw new RuntimeException('Importe api/reservas_natal.sql no phpMyAdmin.');
   }
@@ -340,19 +367,21 @@ function pudim_delete_one_product(PDO $pdo, string $id): void {
 }
 
 function pudim_save_all(PDO $pdo, array $payload): void {
+  pudim_ensure_show_natal($pdo);
   $pdo->beginTransaction();
   try {
     $s = $payload['settings'] ?? [];
     $stmt = $pdo->prepare(
-      'INSERT INTO settings (id, name, tagline, logo, banner, sobre_image, whatsapp, instagram, instagram_user, facebook, email, address, hours, hero_badge, sobre_text1, sobre_text2, whatsapp_message, hide_prices, data_version)
-       VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      'INSERT INTO settings (id, name, tagline, logo, banner, sobre_image, whatsapp, instagram, instagram_user, facebook, email, address, hours, hero_badge, sobre_text1, sobre_text2, whatsapp_message, hide_prices, show_natal, data_version)
+       VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
          name = VALUES(name), tagline = VALUES(tagline), logo = VALUES(logo), banner = VALUES(banner),
          sobre_image = VALUES(sobre_image), whatsapp = VALUES(whatsapp), instagram = VALUES(instagram),
          instagram_user = VALUES(instagram_user), facebook = VALUES(facebook), email = VALUES(email),
          address = VALUES(address), hours = VALUES(hours), hero_badge = VALUES(hero_badge),
          sobre_text1 = VALUES(sobre_text1), sobre_text2 = VALUES(sobre_text2),
-         whatsapp_message = VALUES(whatsapp_message), hide_prices = VALUES(hide_prices), data_version = VALUES(data_version)'
+         whatsapp_message = VALUES(whatsapp_message), hide_prices = VALUES(hide_prices),
+         show_natal = VALUES(show_natal), data_version = VALUES(data_version)'
     );
     $stmt->execute([
       $s['name'] ?? 'O! Pudim',
@@ -372,6 +401,7 @@ function pudim_save_all(PDO $pdo, array $payload): void {
       $s['sobreText2'] ?? '',
       $s['whatsappMessage'] ?? 'Olá! Gostaria de fazer um pedido.',
       !empty($s['hidePrices']) ? 1 : 0,
+      !empty($s['showNatal']) ? 1 : 0,
       (int) ($payload['version'] ?? 1),
     ]);
 

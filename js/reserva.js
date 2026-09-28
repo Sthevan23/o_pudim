@@ -67,5 +67,11 @@
     }
   });
 
-  render();
+  Storage.loadCatalog().then(() => {
+    if (Storage.getSettings().showNatal === false) {
+      window.location.replace("index.html");
+      return;
+    }
+    render();
+  }).catch(render);
 })();

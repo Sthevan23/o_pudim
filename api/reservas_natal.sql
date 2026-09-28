@@ -50,3 +50,5 @@ ON DUPLICATE KEY UPDATE
   image = VALUES(image),
   featured = VALUES(featured),
   active = VALUES(active);
+
+ALTER TABLE `settings` ADD COLUMN IF NOT EXISTS `show_natal` TINYINT(1) NOT NULL DEFAULT 1;

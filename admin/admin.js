@@ -100,6 +100,7 @@ function renderAll() {
   document.getElementById("s-t2").value = s.sobreText2 || "";
   document.getElementById("s-t3").value = s.sobreText3 || "";
   document.getElementById("s-hide").checked = s.hidePrices !== false;
+  document.getElementById("s-natal").checked = s.showNatal !== false;
   document.getElementById("p-cat").innerHTML = Storage.getCategories().map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
 }
 
@@ -214,6 +215,7 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
     sobreText2: document.getElementById("s-t2").value.trim(),
     sobreText3: document.getElementById("s-t3").value.trim(),
     hidePrices: document.getElementById("s-hide").checked,
+    showNatal: document.getElementById("s-natal").checked,
   };
   Storage.setMemory(data);
   try {

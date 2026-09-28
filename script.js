@@ -108,6 +108,21 @@
     if (pudins) pudins.innerHTML = (partners.pudins || []).map(partnerCard).join("");
     const gelatos = document.getElementById("partners-gelatos");
     if (gelatos) gelatos.innerHTML = (partners.gelatos || []).map(partnerCard).join("");
+
+    const natalOn = settings.showNatal !== false;
+    const natalSec = document.getElementById("natal");
+    if (natalSec) natalSec.hidden = !natalOn;
+    const navNatal = document.getElementById("nav-natal");
+    if (navNatal) navNatal.hidden = !natalOn;
+    const heroNatal = document.getElementById("hero-natal");
+    if (heroNatal) heroNatal.hidden = !natalOn;
+    const cart = document.getElementById("header-cart");
+    if (cart) cart.hidden = !natalOn;
+    const sabores = document.getElementById("hero-sabores");
+    if (sabores) {
+      sabores.classList.toggle("btn--primary", !natalOn);
+      sabores.classList.toggle("btn--outline", natalOn);
+    }
   }
 
   document.addEventListener("click", (e) => {
