@@ -49,8 +49,6 @@
     const catName = (id) => (categories.find((c) => c.id === id) || {}).name || "";
 
     document.title = `Pudins artesanais | ${settings.name || "O! Pudim"}`;
-    const brand = document.getElementById("brand-name");
-    if (brand) brand.textContent = settings.name || "O! Pudim";
     const logo = document.getElementById("brand-logo");
     if (logo && settings.logo) logo.src = settings.logo;
     const badge = document.getElementById("hero-badge");
