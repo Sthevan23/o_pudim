@@ -356,9 +356,24 @@ h1, h2, h3, p { margin: 0; }
   margin: 1.1rem 0 0.55rem;
 }
 .seed-unmold {
+  display: grid;
+  grid-template-columns: 5.6rem 1fr;
+  gap: 0.85rem;
+  align-items: center;
+  margin-top: 0.35rem;
   font-size: 0.88rem;
   color: var(--c-muted);
 }
+.seed-qr {
+  display: block;
+  background: #fff;
+  border-radius: 0.85rem;
+  padding: 0.25rem;
+  border: 1px solid var(--c-line);
+  box-shadow: 0 8px 18px rgba(90, 56, 37, 0.08);
+}
+.seed-qr img { display: block; width: 100%; height: auto; border-radius: 0.6rem; }
+.seed-unmold strong { color: var(--c-primary); font-size: 0.95rem; }
 .natal__buy { display: flex; flex-wrap: wrap; align-items: center; gap: 0.9rem; margin-top: 0.55rem; }
 .qty {
   display: inline-flex;
