@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
   <header class="header" id="header">
@@ -29,6 +29,10 @@
         <a href="#contato">Contato</a>
         <a class="btn btn--primary" id="nav-wa" href="#" target="_blank" rel="noopener">Peça pelo WhatsApp</a>
       </nav>
+      <a class="header__cart" href="reserva.html" data-cart-link aria-label="Carrinho da reserva">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span class="header__cart-count" data-cart-count hidden>0</span>
+      </a>
     </div>
   </header>
 
@@ -69,14 +73,15 @@
             </ul>
             <p>Um presente completo para o Natal. Seu pudim será acomodado em uma bag térmica presenteável, reutilizável e resistente, com capacidade para até 14 kg. Acompanha nosso cartão de papel-semente, que pode ser plantado e transformado em vida.</p>
             <p>Mais que uma sobremesa: um presente feito com carinho, fé e propósito pela O! Pudim.</p>
-            <a class="btn btn--primary" href="#natal-form">Quero reservar</a>
+            <div class="natal__buy">
+              <div class="qty">
+                <button type="button" id="natal-minus" aria-label="Diminuir">−</button>
+                <strong id="natal-qty">1</strong>
+                <button type="button" id="natal-plus" aria-label="Aumentar">+</button>
+              </div>
+              <button class="btn btn--primary" type="button" id="natal-add">Adicionar à reserva</button>
+            </div>
           </div>
-        </div>
-        <div class="natal__form" id="natal-form">
-          <h3>Preencha a reserva</h3>
-          <p>As respostas vão direto para o formulário da O! Pudim.</p>
-          <iframe title="Reserva de Natal — Pudim Tradicional Família" src="https://docs.google.com/forms/d/e/1FAIpQLSfpGH5EH2Ms3TOFg7CEK4xuJHN62VK_IzotoCb8Bezr-C7vSA/viewform?embedded=true" loading="lazy">Carregando…</iframe>
-          <p class="natal__form-fallback">Se o formulário não aparecer, <a href="https://docs.google.com/forms/d/e/1FAIpQLSfpGH5EH2Ms3TOFg7CEK4xuJHN62VK_IzotoCb8Bezr-C7vSA/viewform" target="_blank" rel="noopener">abra a reserva neste link</a>.</p>
         </div>
       </div>
     </section>
@@ -184,8 +189,9 @@
   <a class="wa-float" id="wa-float" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
   <div class="lightbox" id="lightbox" hidden></div>
 
-  <script src="js/default-data.js?v=4"></script>
-  <script src="js/storage.js?v=1"></script>
-  <script src="script.js?v=8"></script>
+  <script src="js/default-data.js?v=5"></script>
+  <script src="js/storage.js?v=2"></script>
+  <script src="js/cart.js?v=1"></script>
+  <script src="script.js?v=9"></script>
 </body>
 </html>

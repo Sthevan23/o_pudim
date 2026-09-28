@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Reserva de Natal — O! Pudim</title>
+  <link rel="icon" href="products/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=10">
+</head>
+<body>
+  <header class="header header--scrolled" id="header">
+    <div class="container header__inner">
+      <a href="index.html#topo" class="brand">
+        <img src="products/logo.png" alt="O! Pudim">
+        <span>O! Pudim</span>
+      </a>
+      <nav class="header__nav" style="display:flex">
+        <a href="index.html#natal">Voltar ao Natal</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="cart-page">
+    <div class="container cart-layout">
+      <section>
+        <p class="eyebrow">Reserva de Natal</p>
+        <h1 class="section__title">Seu carrinho</h1>
+        <div id="cart-empty" class="cart-box" hidden>
+          <p>Sua reserva está vazia.</p>
+          <p style="margin-top:1rem"><a class="btn btn--primary" href="index.html#natal">Escolher o pudim família</a></p>
+        </div>
+        <article class="cart-item" id="cart-item" hidden>
+          <img src="products/natal-familia.png" alt="Pudim Tradicional Família">
+          <div>
+            <h3>Pudim Tradicional Família</h3>
+            <p>1,1 kg · serve até 10 pessoas · R$ 65,00</p>
+            <div class="qty">
+              <button type="button" id="qty-minus" aria-label="Diminuir">−</button>
+              <strong id="cart-qty">1</strong>
+              <button type="button" id="qty-plus" aria-label="Aumentar">+</button>
+            </div>
+          </div>
+          <strong id="cart-line">R$ 65,00</strong>
+        </article>
+      </section>
+
+      <aside class="cart-box" id="checkout-box" hidden>
+        <h2>Dados da reserva</h2>
+        <form id="reserva-form">
+          <label>Nome completo *
+            <input class="field" id="r-name" name="name" required autocomplete="name">
+          </label>
+          <label>Telefone/WhatsApp *
+            <input class="field" id="r-phone" name="phone" required inputmode="tel" autocomplete="tel" placeholder="(37) 99999-9999">
+          </label>
+          <label>Forma de pagamento preferida *
+            <select class="field" id="r-pay" name="payment" required>
+              <option value="">Selecione</option>
+              <option value="Pix">Pix</option>
+              <option value="Cartão de débito">Cartão de débito</option>
+              <option value="Cartão de crédito">Cartão de crédito</option>
+            </select>
+          </label>
+          <label>Data desejada *
+            <select class="field" id="r-date" name="desiredDate" required>
+              <option value="">Selecione</option>
+              <option value="23/12/2026">23/12/2026</option>
+              <option value="24/12/2026">24/12/2026</option>
+            </select>
+          </label>
+          <label>Como deseja receber seu pedido? *
+            <select class="field" id="r-receive" name="receiveMethod" required>
+              <option value="">Selecione</option>
+              <option value="Entrega">Entrega</option>
+              <option value="Retirada na .7 Express">Retirada na .7 Express</option>
+              <option value="Retirada no Restaurante do Taioba">Retirada no Restaurante do Taioba</option>
+            </select>
+          </label>
+          <p class="muted">Pagamento antecipado integral. Reservas até 18/12/2026. Confirmação em 20/12/2026.</p>
+          <p><strong>Total: <span id="cart-total">R$ 65,00</span></strong></p>
+          <button class="btn btn--primary btn--full" type="submit" id="reserva-submit">Confirmar reserva</button>
+          <p class="muted" id="reserva-msg" hidden></p>
+        </form>
+      </aside>
+    </div>
+  </main>
+
+  <script src="js/default-data.js?v=5"></script>
+  <script src="js/storage.js?v=2"></script>
+  <script src="js/cart.js?v=1"></script>
+  <script src="js/reserva.js?v=1"></script>
+</body>
+</html>

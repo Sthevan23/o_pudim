@@ -49,6 +49,7 @@ function orderCard(o) {
         <strong>${money(o.total)}</strong>
       </div>
       <div>${(o.items || []).map((i) => `${i.qty}x ${i.name}`).join(" · ") || "Sem itens"}</div>
+      ${o.notes ? `<small>${o.notes}</small>` : ""}
       <select data-status="${o.id}">
         ${["novo","preparo","entrega","finalizado","cancelado"].map((s) => `<option value="${s}" ${o.status === s ? "selected" : ""}>${s}</option>`).join("")}
       </select>

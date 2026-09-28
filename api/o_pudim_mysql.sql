@@ -6,6 +6,7 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS `reservas_natal`;
 DROP TABLE IF EXISTS `order_items`;
 DROP TABLE IF EXISTS `orders`;
 DROP TABLE IF EXISTS `finance`;
@@ -154,6 +155,27 @@ CREATE TABLE `finance` (
   KEY `idx_finance_date` (`entry_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `reservas_natal` (
+  `id` VARCHAR(64) NOT NULL,
+  `number` VARCHAR(40) NOT NULL,
+  `customer_name` VARCHAR(190) NOT NULL,
+  `phone` VARCHAR(30) NOT NULL,
+  `qty` INT NOT NULL DEFAULT 1,
+  `payment` VARCHAR(40) NOT NULL,
+  `desired_date` VARCHAR(20) NOT NULL,
+  `receive_method` VARCHAR(120) NOT NULL,
+  `product_id` VARCHAR(64) NOT NULL DEFAULT 'p-natal',
+  `product_name` VARCHAR(190) NOT NULL DEFAULT 'Pudim Tradicional Família',
+  `price` DECIMAL(10,2) NOT NULL DEFAULT 65.00,
+  `total` DECIMAL(10,2) NOT NULL DEFAULT 65.00,
+  `status` ENUM('novo','confirmado','entregue','cancelado') NOT NULL DEFAULT 'novo',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_reservas_natal_number` (`number`),
+  KEY `idx_reservas_natal_status` (`status`),
+  KEY `idx_reservas_natal_phone` (`phone`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `product_images` (
   `filename` VARCHAR(190) NOT NULL,
   `mime` VARCHAR(64) NOT NULL DEFAULT 'image/png',
@@ -199,6 +221,7 @@ INSERT INTO `categories` (`id`, `name`, `slug`, `sort_order`) VALUES
 ('cat-edi', 'Edições especiais', 'edicoes-especiais', 5);
 
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `category_id`, `image`, `featured`, `slug`, `promo_active`, `promo_price`, `best_seller`, `active`, `sort_order`) VALUES
+('p-natal', 'Pudim Tradicional Família', 'Edição de Natal. Pudim tradicional de 1,1 kg, serve até 10 pessoas. Vai em bag térmica presenteável e cartão de papel-semente.', 65.00, 'cat-edi', 'products/natal-familia.png', 1, 'pudim-tradicional-familia-natal', 0, NULL, 1, 1, -1),
 ('p-joao', 'Que Ele cresça', 'Copo especial com a mensagem de João 3:30. Cremoso, com calda de caramelo e tampa dourada.', 12.00, 'cat-copo', 'products/joao-330.png', 1, 'que-ele-cresca', 0, NULL, 1, 1, 0),
 ('p-trem', 'Uai, que trem bão!', 'Edição mineira, no copo, com calda de caramelo. Sabor da casa com sotaque de Minas.', 12.00, 'cat-copo', 'products/trem-bao.png', 1, 'uai-que-trem-bao', 0, NULL, 1, 1, 1),
 ('p-protein', 'O! Pudim Protein', 'Zero adição de açúcares, 19g de proteína e whey. Rico em proteínas e cálcio.', 14.00, 'cat-copo', 'products/protein.png', 1, 'pudim-protein', 0, NULL, 1, 1, 2),
@@ -217,17 +240,18 @@ INSERT INTO `products` (`id`, `name`, `description`, `price`, `category_id`, `im
 ('p-caramelo', 'Paleta Caramelo Salgado', 'Caramelo, flor de sal e chocolate. Equilíbrio perfeito.', 12.00, 'cat-esp', 'products/caramelo-salgado.png', 0, 'paleta-caramelo-salgado', 1, 10.90, 0, 1, 13);
 
 INSERT INTO `gallery` (`image`, `sort_order`) VALUES
-('products/joao-330.png', 0),
-('products/trem-bao.png', 1),
-('products/protein.png', 2),
-('products/morango.png', 3),
-('products/lotus.png', 4),
-('products/ferrero-gold.png', 5),
-('products/maracuja.png', 6),
-('products/icedim.png', 7),
-('products/donut.png', 8),
-('products/frutas-vermelhas.png', 9),
-('products/avela.png', 10);
+('products/natal-familia.png', 0),
+('products/joao-330.png', 1),
+('products/trem-bao.png', 2),
+('products/protein.png', 3),
+('products/morango.png', 4),
+('products/lotus.png', 5),
+('products/ferrero-gold.png', 6),
+('products/maracuja.png', 7),
+('products/icedim.png', 8),
+('products/donut.png', 9),
+('products/frutas-vermelhas.png', 10),
+('products/avela.png', 11);
 
 INSERT INTO `reviews` (`id`, `author`, `text`, `rating`) VALUES
 ('r1', 'Camila Ferreira', 'O pudim tradicional é o melhor que já comi. Cremoso, no ponto, e a apresentação é linda.', 5),

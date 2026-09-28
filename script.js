@@ -33,7 +33,7 @@
 
   function render() {
     const settings = Storage.getSettings();
-    const products = Storage.getProducts();
+    const products = Storage.getProducts().filter((p) => p.id !== "p-natal");
     const categories = Storage.getCategories();
     const catName = (id) => (categories.find((c) => c.id === id) || {}).name || "";
 
@@ -149,4 +149,19 @@
   });
 
   Storage.loadCatalog().then(render).catch(render);
+
+  let natalQty = 1;
+  const natalQtyEl = document.getElementById("natal-qty");
+  document.getElementById("natal-minus")?.addEventListener("click", () => {
+    natalQty = Math.max(1, natalQty - 1);
+    if (natalQtyEl) natalQtyEl.textContent = String(natalQty);
+  });
+  document.getElementById("natal-plus")?.addEventListener("click", () => {
+    natalQty = Math.min(20, natalQty + 1);
+    if (natalQtyEl) natalQtyEl.textContent = String(natalQty);
+  });
+  document.getElementById("natal-add")?.addEventListener("click", () => {
+    NatalCart.add(natalQty);
+    window.location.href = "reserva.html";
+  });
 })();

@@ -33,6 +33,7 @@ const OPUDIM_DEFAULT_DATA = {
     { id: "cat-edi", name: "Edições especiais", slug: "edicoes-especiais" }
   ],
   products: [
+    { id: "p-natal", name: "Pudim Tradicional Família", description: "Edição de Natal. Pudim tradicional de 1,1 kg, serve até 10 pessoas. Vai em bag térmica presenteável e cartão de papel-semente.", price: 65, categoryId: "cat-edi", image: "products/natal-familia.png", featured: true, slug: "pudim-tradicional-familia-natal", bestSeller: true, active: true },
     { id: "p-joao", name: "Que Ele cresça", description: "Copo especial com a mensagem de João 3:30. Cremoso, com calda de caramelo e tampa dourada.", price: 12, categoryId: "cat-copo", image: "products/joao-330.png", featured: true, slug: "que-ele-cresca", bestSeller: true, active: true },
     { id: "p-trem", name: "Uai, que trem bão!", description: "Edição mineira, no copo, com calda de caramelo. Sabor da casa com sotaque de Minas.", price: 12, categoryId: "cat-copo", image: "products/trem-bao.png", featured: true, slug: "uai-que-trem-bao", bestSeller: true, active: true },
     { id: "p-protein", name: "O! Pudim Protein", description: "Zero adição de açúcares, 19g de proteína e whey. Rico em proteínas e cálcio.", price: 14, categoryId: "cat-copo", image: "products/protein.png", featured: true, slug: "pudim-protein", bestSeller: true, active: true },
@@ -51,6 +52,7 @@ const OPUDIM_DEFAULT_DATA = {
     { id: "p-caramelo", name: "Paleta Caramelo Salgado", description: "Caramelo, flor de sal e chocolate. Equilíbrio perfeito.", price: 12, promoActive: true, promoPrice: 10.9, categoryId: "cat-esp", image: "products/caramelo-salgado.png", featured: false, slug: "paleta-caramelo-salgado", active: true }
   ],
   gallery: [
+    "products/natal-familia.png",
     "products/joao-330.png",
     "products/trem-bao.png",
     "products/protein.png",

@@ -5,7 +5,8 @@ Site + painel admin para Hostinger (HTML/CSS/JS + PHP + MySQL). Sem Node.
 ## Estrutura
 
 - `index.html`, `style.css`, `script.js` — site público
-- Pedidos pelo WhatsApp (sem carrinho no site)
+- Pedidos pelo WhatsApp
+- Reserva de Natal no carrinho (`reserva.html`) — os dados vão para a tabela `reservas_natal`
 - `products/` — fotos
 - `js/` — dados padrão e sync com a API
 - `admin/` — painel
@@ -16,6 +17,7 @@ Site + painel admin para Hostinger (HTML/CSS/JS + PHP + MySQL). Sem Node.
 
 1. No hPanel, crie um banco MySQL (anote usuário, senha e nome).
 2. phpMyAdmin → SQL → importe `api/o_pudim_mysql.sql`.
+   Se o banco **já existia**, importe só `api/reservas_natal.sql` (cria a tabela da reserva de Natal sem apagar nada).
 3. Copie `api/config.local.example.php` para `api/config.local.php` e preencha a senha.
 4. Envie **esta pasta** para `public_html`.
 5. Teste: `seusite.com/api/ping.php`

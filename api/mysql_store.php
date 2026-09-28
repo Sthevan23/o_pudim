@@ -178,9 +178,77 @@ function pudim_load_all(PDO $pdo, string $mode = 'full'): ?array {
   }
 
   $base['clients'] = $clients;
-  $base['orders'] = $orders;
+  $base['orders'] = array_merge(pudim_load_reservas($pdo), $orders);
   $base['finance'] = $finance;
   return $base;
+}
+
+function pudim_load_reservas(PDO $pdo): array {
+  if (!pudim_table_exists($pdo, 'reservas_natal')) return [];
+  $out = [];
+  foreach ($pdo->query('SELECT * FROM reservas_natal ORDER BY created_at DESC') as $row) {
+    $out[] = [
+      'id' => $row['id'],
+      'number' => $row['number'],
+      'clientName' => $row['customer_name'],
+      'clientWhatsapp' => $row['phone'],
+      'total' => (float) $row['total'],
+      'status' => $row['status'] === 'confirmado' ? 'preparo' : ($row['status'] === 'entregue' ? 'entrega' : $row['status']),
+      'notes' => 'Natal · ' . $row['payment'] . ' · ' . $row['desired_date'] . ' · ' . $row['receive_method'],
+      'orderedAt' => $row['created_at'],
+      'kind' => 'natal',
+      'payment' => $row['payment'],
+      'desiredDate' => $row['desired_date'],
+      'receiveMethod' => $row['receive_method'],
+      'items' => [[
+        'productId' => $row['product_id'],
+        'name' => $row['product_name'],
+        'qty' => (int) $row['qty'],
+        'price' => (float) $row['price'],
+      ]],
+    ];
+  }
+  return $out;
+}
+
+function pudim_create_reserva(PDO $pdo, array $reserva): array {
+  if (!pudim_table_exists($pdo, 'reservas_natal')) {
+    throw new RuntimeException('Importe api/reservas_natal.sql no phpMyAdmin.');
+  }
+  $name = trim((string) ($reserva['customerName'] ?? ''));
+  $phone = preg_replace('/\D+/', '', (string) ($reserva['phone'] ?? ''));
+  $qty = max(1, min(20, (int) ($reserva['qty'] ?? 1)));
+  $payment = trim((string) ($reserva['payment'] ?? ''));
+  $date = trim((string) ($reserva['desiredDate'] ?? ''));
+  $receive = trim((string) ($reserva['receiveMethod'] ?? ''));
+  $pays = ['Pix', 'Cartão de débito', 'Cartão de crédito'];
+  $dates = ['23/12/2026', '24/12/2026'];
+  $receives = ['Entrega', 'Retirada na .7 Express', 'Retirada no Restaurante do Taioba'];
+  if ($name === '' || strlen($phone) < 10 || !in_array($payment, $pays, true) || !in_array($date, $dates, true) || !in_array($receive, $receives, true)) {
+    throw new InvalidArgumentException('Preencha todos os dados da reserva.');
+  }
+  $price = 65.00;
+  $total = $price * $qty;
+  $id = pudim_uid('rn');
+  $number = 'NT' . date('ymd') . '-' . strtoupper(substr($id, -4));
+  $stmt = $pdo->prepare(
+    'INSERT INTO reservas_natal (id, number, customer_name, phone, qty, payment, desired_date, receive_method, product_id, product_name, price, total, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+  );
+  $stmt->execute([
+    $id, $number, $name, $phone, $qty, $payment, $date, $receive,
+    'p-natal', 'Pudim Tradicional Família', $price, $total, 'novo',
+  ]);
+  try {
+    $fin = $pdo->prepare(
+      'INSERT INTO finance (id, type, amount, description, entry_date, order_id) VALUES (?, ?, ?, ?, CURDATE(), ?)'
+    );
+    $fin->execute([pudim_uid('f'), 'entrada', $total, 'Reserva Natal ' . $number, $id]);
+  } catch (Throwable $e) { /* finance é opcional */ }
+  try {
+    pudim_find_or_create_client($pdo, ['phone' => $phone], $name, $phone);
+  } catch (Throwable $e) { /* cliente é opcional */ }
+  return ['ok' => true, 'id' => $id, 'number' => $number, 'total' => $total];
 }
 
 function pudim_public_payload(array $data): array {

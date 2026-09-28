@@ -124,6 +124,17 @@ if ($method === 'POST') {
   $pdo = db_or_fail();
   $password = get_password_header() ?: (string) ($body['password'] ?? '');
 
+  if ($actionName === 'create_reserva') {
+    if (!pudim_db_ready($pdo)) json_out(['error' => 'Sistema ainda não inicializado no MySQL.'], 503);
+    try {
+      json_out(pudim_create_reserva($pdo, $body['reserva'] ?? []));
+    } catch (InvalidArgumentException $e) {
+      json_out(['error' => $e->getMessage()], 400);
+    } catch (Throwable $e) {
+      json_out(['error' => $e->getMessage(), 'hint' => 'Importe api/reservas_natal.sql no phpMyAdmin'], 500);
+    }
+  }
+
   if ($actionName === 'create_order') {
     if (!pudim_db_ready($pdo)) json_out(['error' => 'Sistema ainda não inicializado no MySQL.'], 503);
     try {
@@ -180,8 +191,13 @@ if ($method === 'POST') {
     $status = (string) ($body['status'] ?? '');
     $allowed = ['novo', 'preparo', 'entrega', 'finalizado', 'cancelado'];
     if ($orderId === '' || !in_array($status, $allowed, true)) json_out(['error' => 'Pedido inválido'], 400);
-    $stmt = $pdo->prepare('UPDATE orders SET status = ? WHERE id = ?');
-    $stmt->execute([$status, $orderId]);
+    if (strpos($orderId, 'rn-') === 0 && pudim_table_exists($pdo, 'reservas_natal')) {
+      $map = ['novo' => 'novo', 'preparo' => 'confirmado', 'entrega' => 'entregue', 'finalizado' => 'entregue', 'cancelado' => 'cancelado'];
+      $pdo->prepare('UPDATE reservas_natal SET status = ? WHERE id = ?')->execute([$map[$status], $orderId]);
+    } else {
+      $stmt = $pdo->prepare('UPDATE orders SET status = ? WHERE id = ?');
+      $stmt->execute([$status, $orderId]);
+    }
     json_out(['ok' => true, 'id' => $orderId, 'status' => $status]);
   }
 
