@@ -1,6 +1,44 @@
 (function () {
   const money = (n) => Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   const val = (id) => (document.getElementById(id)?.value || "").trim();
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+
+  function prettyPhone(raw) {
+    const d = String(raw || "").replace(/\D/g, "");
+    if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+    if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    return String(raw || "").trim();
+  }
+
+  function reservaLinhas(r, qty, total, address) {
+    const rows = [
+      ["Pedido", `${qty}x Pudim Tradicional Família`],
+      ["Total", total],
+      ["Nome", r.customerName],
+      ["WhatsApp", prettyPhone(r.phone)],
+      ["Pagamento", r.payment],
+      ["Data", r.desiredDate],
+      ["Receber", r.receiveMethod],
+    ];
+    if (address) rows.push(["Endereço", address]);
+    return rows;
+  }
+
+  function reservaWhatsApp(r, qty, total, address) {
+    const parts = ["*Reserva de Natal — O! Pudim*", ""];
+    reservaLinhas(r, qty, total, address).forEach(([label, value]) => {
+      parts.push(`*${label}*`);
+      parts.push(value);
+      parts.push("");
+    });
+    return parts.join("\n").trim();
+  }
+
+  function resumoHtml(rows) {
+    return `<div class="resumo">${rows.map(([k, v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`;
+  }
 
   function isEntrega() {
     return val("r-receive") === "Entrega";
@@ -98,6 +136,8 @@
         price: NatalCart.PRODUCT.price,
       },
     };
+    const total = money(NatalCart.total());
+    const rows = reservaLinhas(payload.reserva, qty, total, address);
     try {
       const res = await fetch("api/data.php", {
         method: "POST",
@@ -112,23 +152,12 @@
       NatalCart.write(0);
       document.getElementById("checkout-box").innerHTML = `
         <h2>Reserva confirmada</h2>
-        <p>Pedido <strong>${data.number}</strong> recebido. Ele já aparece no painel.</p>
+        <p>Pedido <strong>${esc(data.number)}</strong> recebido. Ele já aparece no painel.</p>
+        ${resumoHtml(rows)}
         <p style="margin-top:1rem"><a class="btn btn--primary" href="index.html">Voltar ao site</a></p>`;
       render();
     } catch (err) {
-      const r = payload.reserva;
-      const total = NatalCart.total().toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-      const lines = [
-        "Reserva de Natal O! Pudim",
-        `${qty}x Pudim Tradicional Família — ${total}`,
-        `Nome: ${r.customerName}`,
-        `WhatsApp: ${r.phone}`,
-        `Pagamento: ${r.payment}`,
-        `Data: ${r.desiredDate}`,
-        `Receber: ${r.receiveMethod}`,
-      ];
-      if (address) lines.push(`Endereço: ${address}`);
-      window.open(Storage.waLink(lines.join("\n")), "_blank", "noopener");
+      window.open(Storage.waLink(reservaWhatsApp(payload.reserva, qty, total, address)), "_blank", "noopener");
       msg.hidden = false;
       msg.textContent = "Não deu para gravar no painel. Abrimos o WhatsApp com a reserva para não perder o pedido.";
       btn.disabled = false;

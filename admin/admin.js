@@ -49,19 +49,35 @@ function showPage(id) {
   if (id === "analise") loadVisits();
 }
 
+function prettyPhone(raw) {
+  const d = String(raw || "").replace(/\D/g, "");
+  if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+  if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  return String(raw || "").trim();
+}
+
 function orderCard(o) {
+  const rows = [];
+  const items = (o.items || []).map((i) => `${i.qty}x ${i.name}`).join(", ");
+  if (items) rows.push(["Pedido", items]);
+  if (o.clientName) rows.push(["Nome", o.clientName]);
+  if (o.clientWhatsapp) rows.push(["WhatsApp", prettyPhone(o.clientWhatsapp)]);
+  if (o.payment) rows.push(["Pagamento", o.payment]);
+  if (o.desiredDate) rows.push(["Data", o.desiredDate]);
+  if (o.receiveMethod) rows.push(["Receber", o.receiveMethod]);
+  if (o.deliveryAddress) rows.push(["Endereço", o.deliveryAddress]);
+  const meta = rows.length
+    ? `<div class="order-meta">${rows.map(([k, v]) => `<div><span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong></div>`).join("")}</div>`
+    : `${o.notes ? `<small>${escapeHtml(o.notes)}</small>` : ""}`;
   return `
     <article class="order-card">
       <div class="order-card__top">
         <div>
           <strong>${escapeHtml(o.number || "-")}</strong>
-          <div>${escapeHtml(o.clientName || "")}</div>
-          <small>${escapeHtml(o.clientWhatsapp || "")}</small>
         </div>
         <strong>${money(o.total)}</strong>
       </div>
-      <div>${(o.items || []).map((i) => `${i.qty}x ${escapeHtml(i.name)}`).join(" · ") || "Sem itens"}</div>
-      ${o.notes ? `<small>${escapeHtml(o.notes)}</small>` : ""}
+      ${meta}
       <select data-status="${escapeHtml(o.id)}">
         ${["novo","preparo","entrega","finalizado","cancelado"].map((s) => `<option value="${s}" ${o.status === s ? "selected" : ""}>${s}</option>`).join("")}
       </select>

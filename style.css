@@ -454,6 +454,30 @@ label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--c-pri
 .cart-item p { color: var(--c-muted); font-size: 0.88rem; margin: 0.25rem 0 0.6rem; }
 .cart-box { background: #fff; border-radius: 1.4rem; padding: 1.3rem; box-shadow: var(--shadow); }
 .cart-box h2 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 1rem; }
+.resumo {
+  display: grid;
+  gap: 0;
+  margin: 0.4rem 0 1.1rem;
+  border: 1px solid #e7d8cc;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--c-cream) 55%, #fff);
+}
+.resumo div {
+  display: grid;
+  gap: 0.12rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid #efe4db;
+}
+.resumo div:last-child { border-bottom: 0; }
+.resumo span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.resumo strong { font-size: 0.98rem; font-weight: 700; color: var(--c-primary); }
 .addr-block {
   background: color-mix(in srgb, var(--c-cream) 70%, #fff);
   border: 1px solid #e7d8cc;
