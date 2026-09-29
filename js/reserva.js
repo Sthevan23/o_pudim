@@ -1,5 +1,48 @@
 (function () {
   const money = (n) => Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const val = (id) => (document.getElementById(id)?.value || "").trim();
+
+  function isEntrega() {
+    return val("r-receive") === "Entrega";
+  }
+
+  function toggleAddress() {
+    const box = document.getElementById("r-address-block");
+    const on = isEntrega();
+    box.hidden = !on;
+    ["r-street", "r-number", "r-bairro", "r-city"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.required = on;
+      if (on && id === "r-city" && !el.value.trim()) el.value = "Lagoa da Prata";
+    });
+  }
+
+  function formatCep(raw) {
+    const d = String(raw || "").replace(/\D+/g, "").slice(0, 8);
+    if (d.length > 5) return d.slice(0, 5) + "-" + d.slice(5);
+    return d;
+  }
+
+  function deliveryAddress() {
+    if (!isEntrega()) return "";
+    const street = val("r-street");
+    const number = val("r-number");
+    const bairro = val("r-bairro");
+    const comp = val("r-comp");
+    const city = val("r-city");
+    const cep = formatCep(val("r-cep"));
+    const ref = val("r-ref");
+    const parts = [];
+    const line = [street, number].filter(Boolean).join(", ");
+    if (line) parts.push(line);
+    if (bairro) parts.push(bairro);
+    if (city) parts.push(city);
+    if (cep) parts.push("CEP " + cep);
+    if (comp) parts.push(comp);
+    if (ref) parts.push("Ref.: " + ref);
+    return parts.join(" · ");
+  }
 
   function render() {
     const qty = NatalCart.count();
@@ -27,24 +70,48 @@
     NatalCart.add(1);
     render();
   });
+  document.getElementById("r-receive").addEventListener("change", toggleAddress);
+  document.getElementById("r-cep").addEventListener("input", (e) => {
+    const el = e.target;
+    const start = el.selectionStart;
+    const before = el.value;
+    el.value = formatCep(el.value);
+    if (document.activeElement === el && start != null) {
+      const diff = el.value.length - before.length;
+      el.setSelectionRange(Math.max(0, start + diff), Math.max(0, start + diff));
+    }
+  });
+  toggleAddress();
 
   document.getElementById("reserva-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const qty = NatalCart.count();
     if (qty < 1) return;
+    if (isEntrega() && (!val("r-street") || !val("r-number") || !val("r-bairro") || !val("r-city"))) {
+      return;
+    }
     const btn = document.getElementById("reserva-submit");
     const msg = document.getElementById("reserva-msg");
     btn.disabled = true;
     msg.hidden = true;
+    const address = deliveryAddress();
     const payload = {
       action: "create_reserva",
       reserva: {
-        customerName: document.getElementById("r-name").value.trim(),
-        phone: document.getElementById("r-phone").value.trim(),
+        customerName: val("r-name"),
+        phone: val("r-phone"),
         qty,
-        payment: document.getElementById("r-pay").value,
-        desiredDate: document.getElementById("r-date").value,
-        receiveMethod: document.getElementById("r-receive").value,
+        payment: val("r-pay"),
+        desiredDate: val("r-date"),
+        receiveMethod: val("r-receive"),
+        street: val("r-street"),
+        number: val("r-number"),
+        neighborhood: val("r-bairro"),
+        complement: val("r-comp"),
+        city: val("r-city"),
+        cep: val("r-cep"),
+        reference: val("r-ref"),
+        deliveryAddress: address,
         productId: NatalCart.PRODUCT.id,
         productName: NatalCart.PRODUCT.name,
         price: NatalCart.PRODUCT.price,
@@ -68,22 +135,19 @@
         <p style="margin-top:1rem"><a class="btn btn--primary" href="index.html">Voltar ao site</a></p>`;
       render();
     } catch (err) {
-      const name = payload.reserva.customerName;
-      const phone = payload.reserva.phone;
-      const pay = payload.reserva.payment;
-      const date = payload.reserva.desiredDate;
-      const receive = payload.reserva.receiveMethod;
+      const r = payload.reserva;
       const total = NatalCart.total().toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-      const text = [
+      const lines = [
         "Reserva de Natal O! Pudim",
         `${qty}x Pudim Tradicional Família — ${total}`,
-        `Nome: ${name}`,
-        `WhatsApp: ${phone}`,
-        `Pagamento: ${pay}`,
-        `Data: ${date}`,
-        `Receber: ${receive}`,
-      ].join("\n");
-      window.open(Storage.waLink(text), "_blank", "noopener");
+        `Nome: ${r.customerName}`,
+        `WhatsApp: ${r.phone}`,
+        `Pagamento: ${r.payment}`,
+        `Data: ${r.desiredDate}`,
+        `Receber: ${r.receiveMethod}`,
+      ];
+      if (address) lines.push(`Endereço: ${address}`);
+      window.open(Storage.waLink(lines.join("\n")), "_blank", "noopener");
       msg.hidden = false;
       msg.textContent = "O banco ainda não está ligado no servidor. Abrimos o WhatsApp com a reserva para não perder o pedido.";
       btn.disabled = false;

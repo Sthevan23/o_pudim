@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `reservas_natal` (
   `payment` VARCHAR(40) NOT NULL,
   `desired_date` VARCHAR(20) NOT NULL,
   `receive_method` VARCHAR(120) NOT NULL,
+  `delivery_address` VARCHAR(500) DEFAULT NULL,
   `product_id` VARCHAR(64) NOT NULL DEFAULT 'p-natal',
   `product_name` VARCHAR(190) NOT NULL DEFAULT 'Pudim Tradicional Família',
   `price` DECIMAL(10,2) NOT NULL DEFAULT 65.00,
@@ -52,3 +53,4 @@ ON DUPLICATE KEY UPDATE
   active = VALUES(active);
 
 ALTER TABLE `settings` ADD COLUMN IF NOT EXISTS `show_natal` TINYINT(1) NOT NULL DEFAULT 1;
+ALTER TABLE `reservas_natal` ADD COLUMN IF NOT EXISTS `delivery_address` VARCHAR(500) DEFAULT NULL;

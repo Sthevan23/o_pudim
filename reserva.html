@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=18">
+  <link rel="stylesheet" href="style.css?v=26">
 </head>
 <body>
   <header class="header header--scrolled" id="header">
@@ -80,6 +80,34 @@
               <option value="Retirada no Restaurante do Taioba">Retirada no Restaurante do Taioba</option>
             </select>
           </label>
+          <div class="addr-block" id="r-address-block" hidden>
+            <p class="addr-block__title">Endereço de entrega</p>
+            <div class="addr-row">
+              <label>Rua *
+                <input class="field" id="r-street" name="street" autocomplete="address-line1" placeholder="Nome da rua">
+              </label>
+              <label>Número *
+                <input class="field" id="r-number" name="number" inputmode="numeric" autocomplete="off" placeholder="Nº">
+              </label>
+            </div>
+            <label>Bairro *
+              <input class="field" id="r-bairro" name="neighborhood" autocomplete="address-level3" placeholder="Bairro">
+            </label>
+            <label>Complemento
+              <input class="field" id="r-comp" name="complement" autocomplete="address-line2" placeholder="Apto, bloco, casa…">
+            </label>
+            <div class="addr-row addr-row--city">
+              <label>Cidade *
+                <input class="field" id="r-city" name="city" autocomplete="address-level2" value="Lagoa da Prata">
+              </label>
+              <label>CEP
+                <input class="field" id="r-cep" name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9">
+              </label>
+            </div>
+            <label>Ponto de referência
+              <input class="field" id="r-ref" name="reference" placeholder="Próximo a…">
+            </label>
+          </div>
           <p class="muted">Pagamento antecipado integral. Reservas até 18/12/2026. Confirmação em 20/12/2026.</p>
           <p><strong>Total: <span id="cart-total">R$ 65,00</span></strong></p>
           <button class="btn btn--primary btn--full" type="submit" id="reserva-submit">Confirmar reserva</button>
@@ -92,6 +120,6 @@
   <script src="js/default-data.js?v=6"></script>
   <script src="js/storage.js?v=3"></script>
   <script src="js/cart.js?v=1"></script>
-  <script src="js/reserva.js?v=4"></script>
+  <script src="js/reserva.js?v=5"></script>
 </body>
 </html>
