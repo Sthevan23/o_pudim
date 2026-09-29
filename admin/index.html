@@ -8,7 +8,7 @@
   <link rel="icon" href="../products/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="admin.css?v=9">
+  <link rel="stylesheet" href="admin.css?v=10">
   <script>if (sessionStorage.getItem("admin_logged") !== "true") location.replace("login.html");</script>
 </head>
 <body>
@@ -40,10 +40,10 @@
 
     <section class="admin-page active" id="page-dashboard">
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-card__icon" style="background:#e0f2f1;color:#1a6b63"><i class="fas fa-shopping-bag"></i></div><div><span class="stat-card__label">Pedidos</span><strong class="stat-card__value" id="stat-orders">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#f5e6d3;color:#8b5e3c"><i class="fas fa-shopping-bag"></i></div><div><span class="stat-card__label">Pedidos</span><strong class="stat-card__value" id="stat-orders">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#e8f5e9;color:#2e7d32"><i class="fas fa-dollar-sign"></i></div><div><span class="stat-card__label">Vendas</span><strong class="stat-card__value" id="stat-sales">R$ 0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#e3f2fd;color:#1565c0"><i class="fas fa-users"></i></div><div><span class="stat-card__label">Clientes</span><strong class="stat-card__value" id="stat-clients">0</strong></div></div>
-        <div class="stat-card"><div class="stat-card__icon" style="background:#fff8e1;color:#c9a227"><i class="fas fa-ice-cream"></i></div><div><span class="stat-card__label">Produtos ativos</span><strong class="stat-card__value" id="stat-products">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#fff3e0;color:#c58b5c"><i class="fas fa-ice-cream"></i></div><div><span class="stat-card__label">Produtos ativos</span><strong class="stat-card__value" id="stat-products">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#ede7f6;color:#5e35b1"><i class="fas fa-user"></i></div><div><span class="stat-card__label">Pessoas hoje</span><strong class="stat-card__value" id="stat-visitors-today">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#e0f7fa;color:#00838f"><i class="fas fa-eye"></i></div><div><span class="stat-card__label">Visitas hoje</span><strong class="stat-card__value" id="stat-views-today">0</strong></div></div>
       </div>
@@ -76,7 +76,7 @@
         <div class="stat-card"><div class="stat-card__icon" style="background:#e8f5e9;color:#2e7d32"><i class="fas fa-users"></i></div><div><span class="stat-card__label">Pessoas em 7 dias</span><strong class="stat-card__value" id="an-visitors-7d">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#fff3e0;color:#ef6c00"><i class="fas fa-chart-line"></i></div><div><span class="stat-card__label">Visitas em 7 dias</span><strong class="stat-card__value" id="an-views-7d">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#fce4ec;color:#c2185b"><i class="fas fa-heart"></i></div><div><span class="stat-card__label">Pessoas no total</span><strong class="stat-card__value" id="an-visitors-total">0</strong></div></div>
-        <div class="stat-card"><div class="stat-card__icon" style="background:#e0f2f1;color:#1a6b63"><i class="fas fa-globe"></i></div><div><span class="stat-card__label">Visitas no total</span><strong class="stat-card__value" id="an-views-total">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#f5e6d3;color:#8b5e3c"><i class="fas fa-globe"></i></div><div><span class="stat-card__label">Visitas no total</span><strong class="stat-card__value" id="an-views-total">0</strong></div></div>
       </div>
       <h2 class="section-title">Últimos 7 dias</h2>
       <div class="table-wrap">

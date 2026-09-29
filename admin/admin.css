@@ -1,13 +1,13 @@
 :root {
-  --bg: #f3f7f6;
+  --bg: #f5efe8;
   --white: #fff;
-  --primary: #1a6b63;
-  --primary-dark: #134e48;
-  --secondary: #c9a227;
-  --cream: #e7f3f1;
-  --text: #152824;
-  --muted: #5c716e;
-  --line: #cfe0dc;
+  --primary: #8b5e3c;
+  --primary-dark: #6b4429;
+  --secondary: #c58b5c;
+  --cream: #f5e6d3;
+  --text: #241a15;
+  --muted: #746357;
+  --line: #eadfd4;
   --danger: #c62828;
   --ok: #2e7d32;
   --info: #1976d2;
@@ -17,8 +17,8 @@
   --font: "Manrope", system-ui, sans-serif;
   --display: "Playfair Display", Georgia, serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --shadow: 0 16px 40px rgba(26, 107, 99, 0.12);
-  --shadow-soft: 0 8px 24px rgba(19, 78, 72, 0.06);
+  --shadow: 0 16px 40px rgba(90, 56, 37, 0.1);
+  --shadow-soft: 0 8px 24px rgba(90, 56, 37, 0.05);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { max-width: 100%; }
@@ -215,7 +215,7 @@ th { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
   justify-content: center;
   border-radius: 8px;
 }
-.btn--icon.edit { background: #e0f2f1; color: var(--primary); }
+.btn--icon.edit { background: var(--cream); color: var(--primary); }
 .btn--icon.edit:hover { background: var(--primary); color: #fff; }
 
 .page-card, .card {
@@ -263,7 +263,7 @@ th { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
 .status-item__bar {
   flex: 1;
   height: 6px;
-  background: #eef4f3;
+  background: #f0e8df;
   border-radius: 3px;
   margin: 0 12px;
   overflow: hidden;
@@ -356,7 +356,7 @@ th { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
   border-radius: inherit;
 }
 
-.modal { position: fixed; inset: 0; background: rgba(19, 78, 72, .45); display: none; place-items: center; z-index: 40; padding: 16px; }
+.modal { position: fixed; inset: 0; background: rgba(36, 26, 21, .45); display: none; place-items: center; z-index: 40; padding: 16px; }
 .modal.active { display: grid; animation: fade 200ms var(--ease); }
 .modal__box { background: #fff; border-radius: 20px; width: min(640px, 100%); padding: 20px; max-height: 90vh; overflow: auto; animation: fadeUp 280ms var(--ease); }
 .modal__box--wide { width: min(760px, 100%); }
@@ -371,7 +371,7 @@ th { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
 .login-page { display: block; }
 .login { display: flex; min-height: 100vh; min-height: 100dvh; }
 .login__visual { flex: 1; background: url('../products/morango.png') center/cover; position: relative; min-height: 240px; }
-.login__overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(19, 78, 72, .88), rgba(26, 107, 99, .5)); }
+.login__overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(36, 26, 21, .82), rgba(139, 94, 60, .55)); }
 .login__visual-content { position: relative; z-index: 1; color: #fff; height: 100%; display: grid; place-content: center; text-align: center; padding: 24px; }
 .login__visual-content h1 { font-family: var(--display); font-size: clamp(2rem, 5vw, 3rem); }
 .login__form-wrapper { width: min(460px, 100%); background: #fff; display: grid; place-items: center; padding: 32px 22px; }
@@ -441,7 +441,7 @@ th { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(19, 78, 72, .4);
+    background: rgba(36, 26, 21, .4);
     z-index: 25;
   }
   .sidebar-overlay.show { display: block; }
