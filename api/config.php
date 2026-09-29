@@ -13,8 +13,8 @@ if (is_file($example)) {
 return [
   'host' => getenv('OPUDIM_DB_HOST') ?: 'localhost',
   'port' => (int) (getenv('OPUDIM_DB_PORT') ?: 3306),
-  'name' => getenv('OPUDIM_DB_NAME') ?: 'u586760337_opudim',
-  'user' => getenv('OPUDIM_DB_USER') ?: 'u586760337_opudim',
+  'name' => getenv('OPUDIM_DB_NAME') ?: 'u586160337_opudim',
+  'user' => getenv('OPUDIM_DB_USER') ?: 'u586160337_opudim',
   'pass' => getenv('OPUDIM_DB_PASS') ?: '',
   'charset' => 'utf8mb4',
 ];

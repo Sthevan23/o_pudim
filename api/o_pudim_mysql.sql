@@ -1,5 +1,5 @@
 -- O! Pudim — schema MySQL (Hostinger / phpMyAdmin)
--- 1) Crie o banco no hPanel (ex.: u586760337_opudim)
+-- 1) Crie o banco no hPanel (ex.: u586160337_opudim)
 -- 2) phpMyAdmin > SQL > cole este arquivo e Execute
 -- 3) Preencha api/config.local.php com usuário/senha
 
