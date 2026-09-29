@@ -1,10 +1,13 @@
 DirectoryIndex index.html index.php
 Options -Indexes
 
+<Files "opudim_reservas.json">
+  Require all denied
+</Files>
 <Files "config.local.php">
   Require all denied
 </Files>
-<FilesMatch "^(config\.local\.php)$">
+<FilesMatch "^(config\.local\.php|opudim_reservas\.json)$">
   Order allow,deny
   Deny from all
 </FilesMatch>

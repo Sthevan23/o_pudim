@@ -1,4 +1,6 @@
 api/config.local.php
+api/data/*.json
+opudim_reservas.json
 *.log
 .DS_Store
 Thumbs.db

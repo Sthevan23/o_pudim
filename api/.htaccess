@@ -1,7 +1,7 @@
 <Files "config.local.php">
   Require all denied
 </Files>
-<FilesMatch "^(config\.local\.php)$">
+<FilesMatch "^(config\.local\.php|reservas_natal\.json)$">
   Order allow,deny
   Deny from all
 </FilesMatch>

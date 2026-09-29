@@ -33,6 +33,7 @@ if (
 }
 
 require_once __DIR__ . '/mysql_store.php';
+require_once __DIR__ . '/reserva_file.php';
 
 function json_out($payload, int $code = 200): void {
   http_response_code($code);
@@ -92,7 +93,7 @@ if ($method === 'GET') {
     $ok = $auth['password'] !== '' && hash_equals($auth['password'], (string) $password);
     if (!$ok) json_out(['error' => 'Senha inválida'], 401);
     header('Cache-Control: no-store');
-    json_out($data);
+    json_out(pudim_attach_file_orders($data));
   }
 
   try { pudim_write_public_catalog($pdo); } catch (Throwable $e) {}
@@ -113,41 +114,83 @@ if ($method === 'POST') {
     try {
       $pdoAuth = pudim_db();
       $auth = pudim_get_auth($pdoAuth);
+      $authEmail = (string) ($auth['email'] ?? '');
+      $authPass = (string) ($auth['password'] ?? '');
+      if ($authEmail === '' || $authPass === '') {
+        throw new RuntimeException('Banco sem dados.');
+      }
+      if (!hash_equals($authEmail, $email) || !hash_equals($authPass, $pass)) {
+        json_out(['error' => 'E-mail ou senha incorretos.'], 401);
+      }
+      try {
+        $stored = pudim_load_all($pdoAuth, 'full');
+        pudim_write_public_catalog($pdoAuth);
+      } catch (Throwable $e) {
+        json_out(['error' => 'Falha ao ler MySQL', 'detail' => $e->getMessage()], 500);
+      }
+      json_out(['ok' => true, 'data' => pudim_attach_file_orders(is_array($stored) ? $stored : [])]);
     } catch (Throwable $e) {
-      json_out(['error' => 'Falha na conexão MySQL', 'detail' => $e->getMessage()], 500);
+      $fb = pudim_fallback_auth();
+      if (hash_equals($fb['email'], $email) && hash_equals($fb['password'], $pass)) {
+        json_out(['ok' => true, 'data' => pudim_offline_admin_data(), 'mode' => 'arquivo']);
+      }
+      json_out([
+        'error' => 'Falha na conexão MySQL',
+        'detail' => $e->getMessage(),
+      ], 500);
     }
+  }
 
-    $authEmail = (string) ($auth['email'] ?? '');
-    $authPass = (string) ($auth['password'] ?? '');
-    if ($authEmail === '' || $authPass === '') {
-      json_out(['error' => 'Banco sem dados. Importe api/o_pudim_mysql.sql no phpMyAdmin.'], 404);
-    }
-    if (!hash_equals($authEmail, $email) || !hash_equals($authPass, $pass)) {
-      json_out(['error' => 'E-mail ou senha incorretos.'], 401);
-    }
-
+  if ($actionName === 'create_reserva') {
     try {
-      $stored = pudim_load_all($pdoAuth, 'full');
-      pudim_write_public_catalog($pdoAuth);
+      $row = pudim_file_create_reserva($body['reserva'] ?? []);
+    } catch (InvalidArgumentException $e) {
+      json_out(['error' => $e->getMessage()], 400);
     } catch (Throwable $e) {
-      json_out(['error' => 'Falha ao ler MySQL', 'detail' => $e->getMessage()], 500);
+      json_out(['error' => 'Não foi possível gravar a reserva.', 'detail' => $e->getMessage()], 500);
     }
-    json_out(['ok' => true, 'data' => $stored]);
+    try {
+      pudim_mysql_save_reserva(pudim_db(), $row);
+    } catch (Throwable $e) { /* arquivo já salvou */ }
+    json_out([
+      'ok' => true,
+      'id' => $row['id'],
+      'number' => $row['number'],
+      'total' => $row['total'],
+    ]);
+  }
+
+  if ($actionName === 'list_reservas') {
+    $listPass = get_password_header() ?: (string) ($body['password'] ?? '');
+    if (!pudim_admin_password_ok($listPass)) json_out(['error' => 'Senha inválida'], 401);
+    json_out(['ok' => true, 'orders' => pudim_file_load_reservas()]);
+  }
+
+  if ($actionName === 'set_order_status') {
+    $statusPass = get_password_header() ?: (string) ($body['password'] ?? '');
+    if (!pudim_admin_password_ok($statusPass)) json_out(['error' => 'Senha inválida'], 401);
+    $orderId = trim((string) ($body['id'] ?? ''));
+    $status = (string) ($body['status'] ?? '');
+    $allowed = ['novo', 'preparo', 'entrega', 'finalizado', 'cancelado'];
+    if ($orderId === '' || !in_array($status, $allowed, true)) json_out(['error' => 'Pedido inválido'], 400);
+    try {
+      pudim_file_set_status($orderId, $status);
+    } catch (Throwable $e) { /* segue para MySQL se houver */ }
+    try {
+      $pdoStatus = pudim_db();
+      if (strpos($orderId, 'rn-') === 0 && pudim_table_exists($pdoStatus, 'reservas_natal')) {
+        $map = ['novo' => 'novo', 'preparo' => 'confirmado', 'entrega' => 'entregue', 'finalizado' => 'entregue', 'cancelado' => 'cancelado'];
+        $pdoStatus->prepare('UPDATE reservas_natal SET status = ? WHERE id = ?')->execute([$map[$status], $orderId]);
+      } else {
+        $stmt = $pdoStatus->prepare('UPDATE orders SET status = ? WHERE id = ?');
+        $stmt->execute([$status, $orderId]);
+      }
+    } catch (Throwable $e) { /* arquivo já atualizou */ }
+    json_out(['ok' => true, 'id' => $orderId, 'status' => $status]);
   }
 
   $pdo = db_or_fail();
   $password = get_password_header() ?: (string) ($body['password'] ?? '');
-
-  if ($actionName === 'create_reserva') {
-    if (!pudim_db_ready($pdo)) json_out(['error' => 'Sistema ainda não inicializado no MySQL.'], 503);
-    try {
-      json_out(pudim_create_reserva($pdo, $body['reserva'] ?? []));
-    } catch (InvalidArgumentException $e) {
-      json_out(['error' => $e->getMessage()], 400);
-    } catch (Throwable $e) {
-      json_out(['error' => $e->getMessage(), 'hint' => 'Importe api/reservas_natal.sql no phpMyAdmin'], 500);
-    }
-  }
 
   if ($actionName === 'create_order') {
     if (!pudim_db_ready($pdo)) json_out(['error' => 'Sistema ainda não inicializado no MySQL.'], 503);
@@ -160,7 +203,7 @@ if ($method === 'POST') {
     }
   }
 
-  if (in_array($actionName, ['save_product', 'delete_product', 'set_product_active', 'publish_catalog', 'save_settings', 'set_order_status'], true)) {
+  if (in_array($actionName, ['save_product', 'delete_product', 'set_product_active', 'publish_catalog', 'save_settings'], true)) {
     $auth = pudim_get_auth($pdo);
     if ($password === '' || $auth['password'] === '' || !hash_equals($auth['password'], $password)) {
       json_out(['error' => 'Senha inválida'], 401);
@@ -198,21 +241,6 @@ if ($method === 'POST') {
     $stmt->execute([$active, $productId]);
     try { pudim_write_public_catalog($pdo); } catch (Throwable $e) {}
     json_out(['ok' => true, 'id' => $productId, 'active' => $active === 1]);
-  }
-
-  if ($actionName === 'set_order_status') {
-    $orderId = trim((string) ($body['id'] ?? ''));
-    $status = (string) ($body['status'] ?? '');
-    $allowed = ['novo', 'preparo', 'entrega', 'finalizado', 'cancelado'];
-    if ($orderId === '' || !in_array($status, $allowed, true)) json_out(['error' => 'Pedido inválido'], 400);
-    if (strpos($orderId, 'rn-') === 0 && pudim_table_exists($pdo, 'reservas_natal')) {
-      $map = ['novo' => 'novo', 'preparo' => 'confirmado', 'entrega' => 'entregue', 'finalizado' => 'entregue', 'cancelado' => 'cancelado'];
-      $pdo->prepare('UPDATE reservas_natal SET status = ? WHERE id = ?')->execute([$map[$status], $orderId]);
-    } else {
-      $stmt = $pdo->prepare('UPDATE orders SET status = ? WHERE id = ?');
-      $stmt->execute([$status, $orderId]);
-    }
-    json_out(['ok' => true, 'id' => $orderId, 'status' => $status]);
   }
 
   if ($actionName === 'publish_catalog') {

@@ -18,12 +18,6 @@
     });
   }
 
-  function formatCep(raw) {
-    const d = String(raw || "").replace(/\D+/g, "").slice(0, 8);
-    if (d.length > 5) return d.slice(0, 5) + "-" + d.slice(5);
-    return d;
-  }
-
   function deliveryAddress() {
     if (!isEntrega()) return "";
     const street = val("r-street");
@@ -31,14 +25,12 @@
     const bairro = val("r-bairro");
     const comp = val("r-comp");
     const city = val("r-city");
-    const cep = formatCep(val("r-cep"));
     const ref = val("r-ref");
     const parts = [];
     const line = [street, number].filter(Boolean).join(", ");
     if (line) parts.push(line);
     if (bairro) parts.push(bairro);
     if (city) parts.push(city);
-    if (cep) parts.push("CEP " + cep);
     if (comp) parts.push(comp);
     if (ref) parts.push("Ref.: " + ref);
     return parts.join(" · ");
@@ -71,16 +63,6 @@
     render();
   });
   document.getElementById("r-receive").addEventListener("change", toggleAddress);
-  document.getElementById("r-cep").addEventListener("input", (e) => {
-    const el = e.target;
-    const start = el.selectionStart;
-    const before = el.value;
-    el.value = formatCep(el.value);
-    if (document.activeElement === el && start != null) {
-      const diff = el.value.length - before.length;
-      el.setSelectionRange(Math.max(0, start + diff), Math.max(0, start + diff));
-    }
-  });
   toggleAddress();
 
   document.getElementById("reserva-form").addEventListener("submit", async (e) => {
@@ -109,7 +91,6 @@
         neighborhood: val("r-bairro"),
         complement: val("r-comp"),
         city: val("r-city"),
-        cep: val("r-cep"),
         reference: val("r-ref"),
         deliveryAddress: address,
         productId: NatalCart.PRODUCT.id,
@@ -131,7 +112,7 @@
       NatalCart.write(0);
       document.getElementById("checkout-box").innerHTML = `
         <h2>Reserva confirmada</h2>
-        <p>Pedido <strong>${data.number}</strong> recebido. Nossa equipe confirma os pedidos em 20/12/2026.</p>
+        <p>Pedido <strong>${data.number}</strong> recebido. Ele já aparece no painel.</p>
         <p style="margin-top:1rem"><a class="btn btn--primary" href="index.html">Voltar ao site</a></p>`;
       render();
     } catch (err) {
@@ -149,7 +130,7 @@
       if (address) lines.push(`Endereço: ${address}`);
       window.open(Storage.waLink(lines.join("\n")), "_blank", "noopener");
       msg.hidden = false;
-      msg.textContent = "O banco ainda não está ligado no servidor. Abrimos o WhatsApp com a reserva para não perder o pedido.";
+      msg.textContent = "Não deu para gravar no painel. Abrimos o WhatsApp com a reserva para não perder o pedido.";
       btn.disabled = false;
     }
   });

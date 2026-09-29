@@ -115,7 +115,22 @@ const Storage = (() => {
       return data;
     } catch {
       cloudEnabled = false;
-      return getData();
+      try {
+        const file = await fetchJson(API, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Password': password,
+          },
+          body: JSON.stringify({ action: 'list_reservas', password }),
+        });
+        const data = getData();
+        if (Array.isArray(file.orders)) data.orders = file.orders;
+        setMemory(data);
+        return data;
+      } catch {
+        return getData();
+      }
     }
   }
 

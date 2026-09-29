@@ -253,7 +253,6 @@ function pudim_format_delivery_address(array $reserva): string {
   $bairro = trim((string) ($reserva['neighborhood'] ?? ''));
   $comp = trim((string) ($reserva['complement'] ?? ''));
   $city = trim((string) ($reserva['city'] ?? ''));
-  $cep = preg_replace('/\D+/', '', (string) ($reserva['cep'] ?? ''));
   $ref = trim((string) ($reserva['reference'] ?? ''));
   $parts = [];
   $line = $street;
@@ -261,12 +260,6 @@ function pudim_format_delivery_address(array $reserva): string {
   if ($line !== '') $parts[] = $line;
   if ($bairro !== '') $parts[] = $bairro;
   if ($city !== '') $parts[] = $city;
-  if ($cep !== '') {
-    if (strlen($cep) === 8) {
-      $cep = substr($cep, 0, 5) . '-' . substr($cep, 5);
-    }
-    $parts[] = 'CEP ' . $cep;
-  }
   if ($comp !== '') $parts[] = $comp;
   if ($ref !== '') $parts[] = 'Ref.: ' . $ref;
   $out = implode(' · ', $parts);
@@ -377,6 +370,57 @@ function pudim_create_reserva(PDO $pdo, array $reserva): array {
     pudim_find_or_create_client($pdo, ['phone' => $phone, 'address' => $address], $name, $phone);
   } catch (Throwable $e) { /* cliente é opcional */ }
   return ['ok' => true, 'id' => $id, 'number' => $number, 'total' => $total];
+}
+
+function pudim_mysql_save_reserva(PDO $pdo, array $order): void {
+  pudim_ensure_show_natal($pdo);
+  pudim_ensure_reservas_natal($pdo);
+  if (!pudim_table_exists($pdo, 'reservas_natal')) return;
+  $id = (string) ($order['id'] ?? '');
+  $number = (string) ($order['number'] ?? '');
+  $name = (string) ($order['clientName'] ?? '');
+  $phone = preg_replace('/\D+/', '', (string) ($order['clientWhatsapp'] ?? ''));
+  $qty = max(1, (int) ($order['qty'] ?? ($order['items'][0]['qty'] ?? 1)));
+  $payment = (string) ($order['payment'] ?? '');
+  $date = (string) ($order['desiredDate'] ?? '');
+  $receive = (string) ($order['receiveMethod'] ?? '');
+  $address = (string) ($order['deliveryAddress'] ?? '');
+  $price = 65.00;
+  $total = (float) ($order['total'] ?? ($price * $qty));
+  if ($id === '' || $number === '' || $name === '') return;
+  $stmt = $pdo->prepare(
+    'INSERT INTO reservas_natal (id, number, customer_name, phone, qty, payment, desired_date, receive_method, delivery_address, product_id, product_name, price, total, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE
+       customer_name = VALUES(customer_name),
+       phone = VALUES(phone),
+       qty = VALUES(qty),
+       payment = VALUES(payment),
+       desired_date = VALUES(desired_date),
+       receive_method = VALUES(receive_method),
+       delivery_address = VALUES(delivery_address),
+       total = VALUES(total)'
+  );
+  try {
+    $stmt->execute([
+      $id, $number, $name, $phone, $qty, $payment, $date, $receive, $address !== '' ? $address : null,
+      'p-natal', 'Pudim Tradicional Família', $price, $total, 'novo',
+    ]);
+  } catch (Throwable $e) {
+    $stmt = $pdo->prepare(
+      'INSERT INTO reservas_natal (id, number, customer_name, phone, qty, payment, desired_date, receive_method, product_id, product_name, price, total, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         customer_name = VALUES(customer_name),
+         phone = VALUES(phone),
+         qty = VALUES(qty),
+         total = VALUES(total)'
+    );
+    $stmt->execute([
+      $id, $number, $name, $phone, $qty, $payment, $date, $receive,
+      'p-natal', 'Pudim Tradicional Família', $price, $total, 'novo',
+    ]);
+  }
 }
 
 function pudim_public_payload(array $data): array {
