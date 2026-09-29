@@ -134,6 +134,7 @@ const Storage = (() => {
         });
         const data = getData();
         if (Array.isArray(file.orders)) data.orders = file.orders;
+        if (Array.isArray(file.finance)) data.finance = file.finance;
         try {
           const extra = await fetchJson(API + (API.includes('?') ? '&' : '?') + 'action=partners&t=' + Date.now());
           if (extra && extra.partners) data.partners = extra.partners;

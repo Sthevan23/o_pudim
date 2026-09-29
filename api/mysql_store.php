@@ -198,7 +198,9 @@ function pudim_load_all(PDO $pdo, string $mode = 'full'): ?array {
 
   $base['clients'] = $clients;
   $base['orders'] = array_merge(pudim_load_reservas($pdo), $orders);
-  $base['finance'] = $finance;
+  $base['finance'] = function_exists('pudim_merge_finance')
+    ? pudim_merge_finance($finance, $base['orders'])
+    : $finance;
   return $base;
 }
 

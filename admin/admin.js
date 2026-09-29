@@ -140,12 +140,46 @@ async function loadVisits() {
   }
 }
 
+function financeLedger() {
+  const orders = Storage.getOrders();
+  const fromOrders = (orders || []).filter((o) => o.status !== "cancelado" && Number(o.total) > 0).map((o) => {
+    const when = String(o.orderedAt || "");
+    const date = /^\d{4}-\d{2}-\d{2}/.test(when) ? when.slice(0, 10) : when.slice(0, 10);
+    return {
+      id: "fin-" + (o.id || o.number || ""),
+      type: "entrada",
+      amount: Number(o.total || 0),
+      description: ["Reserva", o.number, o.clientName, o.payment].filter(Boolean).join(" · "),
+      date,
+      orderId: o.id || "",
+    };
+  });
+  const finance = Storage.getFinance() || [];
+  const seen = new Set();
+  const out = [];
+  finance.forEach((f) => {
+    const oid = String(f.orderId || "");
+    if (oid) seen.add(oid);
+    const fid = String(f.id || "");
+    if (fid.startsWith("fin-")) seen.add(fid.slice(4));
+    out.push(f);
+  });
+  fromOrders.forEach((f) => {
+    if (f.orderId && seen.has(f.orderId)) return;
+    out.push(f);
+    if (f.orderId) seen.add(f.orderId);
+  });
+  return out;
+}
+
 function renderAll() {
   const orders = Storage.getOrders();
   const clients = Storage.getClients();
   const products = Storage.getAllProducts();
-  const finance = Storage.getFinance();
-  const sales = finance.filter((f) => f.type === "entrada").reduce((s, f) => s + Number(f.amount || 0), 0);
+  const finance = financeLedger();
+  const entradas = finance.filter((f) => f.type === "entrada").reduce((s, f) => s + Number(f.amount || 0), 0);
+  const saidas = finance.filter((f) => f.type === "saida" || f.type === "saída").reduce((s, f) => s + Number(f.amount || 0), 0);
+  const sales = entradas - saidas;
   document.getElementById("stat-orders").textContent = String(orders.length);
   document.getElementById("stat-sales").textContent = money(sales);
   document.getElementById("stat-clients").textContent = String(clients.length);
@@ -179,7 +213,18 @@ function renderAll() {
   }).join("") || `<tr><td colspan="7">Nenhum produto cadastrado.</td></tr>`;
 
   document.getElementById("clients-body").innerHTML = clients.map((c) => `<tr><td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.phone || "")}</td><td>${escapeHtml(c.email || "")}</td></tr>`).join("") || `<tr><td colspan="3">Nenhum cliente ainda.</td></tr>`;
-  document.getElementById("finance-body").innerHTML = finance.map((f) => `<tr><td>${escapeHtml(f.date || "")}</td><td>${escapeHtml(f.type)}</td><td>${escapeHtml(f.description || "")}</td><td>${money(f.amount)}</td></tr>`).join("") || `<tr><td colspan="4">Sem lançamentos.</td></tr>`;
+  const finIn = document.getElementById("fin-in");
+  const finOut = document.getElementById("fin-out");
+  const finBal = document.getElementById("fin-bal");
+  if (finIn) finIn.textContent = money(entradas);
+  if (finOut) finOut.textContent = money(saidas);
+  if (finBal) finBal.textContent = money(sales);
+  document.getElementById("finance-body").innerHTML = finance.map((f) => {
+    const d = String(f.date || "");
+    const m = d.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    const nice = m ? `${m[3]}/${m[2]}/${m[1]}` : d;
+    return `<tr><td>${escapeHtml(nice)}</td><td>${escapeHtml(f.type === "entrada" ? "Entrada" : "Saída")}</td><td>${escapeHtml(f.description || "")}</td><td>${money(f.amount)}</td></tr>`;
+  }).join("") || `<tr><td colspan="4">Nenhuma reserva ainda para contar.</td></tr>`;
 
   const s = Storage.getSettings();
   document.getElementById("s-name").value = s.name || "";

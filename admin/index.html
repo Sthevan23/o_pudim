@@ -126,6 +126,12 @@
     </section>
 
     <section class="admin-page" id="page-financeiro">
+      <p class="fin-note">O financeiro soma as reservas de Natal (pedidos não cancelados).</p>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-card__icon" style="background:#e8f5e9;color:#2e7d32"><i class="fas fa-arrow-down"></i></div><div><span class="stat-card__label">Entradas</span><strong class="stat-card__value" id="fin-in">R$ 0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#fce4ec;color:#c2185b"><i class="fas fa-arrow-up"></i></div><div><span class="stat-card__label">Saídas</span><strong class="stat-card__value" id="fin-out">R$ 0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#e3f2fd;color:#1565c0"><i class="fas fa-wallet"></i></div><div><span class="stat-card__label">Saldo</span><strong class="stat-card__value" id="fin-bal">R$ 0</strong></div></div>
+      </div>
       <div class="table-wrap"><table><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor</th></tr></thead><tbody id="finance-body"></tbody></table></div>
     </section>
 
@@ -209,7 +215,7 @@
   <div class="toast" id="toast"></div>
 
   <script src="../js/default-data.js?v=6"></script>
-  <script src="../js/storage.js?v=5"></script>
-  <script src="admin.js?v=10"></script>
+  <script src="../js/storage.js?v=6"></script>
+  <script src="admin.js?v=11"></script>
 </body>
 </html>

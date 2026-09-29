@@ -93,11 +93,64 @@ function pudim_merge_file_orders(array $orders): array {
   return $out;
 }
 
+function pudim_finance_from_orders(array $orders): array {
+  $out = [];
+  foreach ($orders as $o) {
+    if (!is_array($o)) continue;
+    $status = (string) ($o['status'] ?? '');
+    if ($status === 'cancelado') continue;
+    $total = (float) ($o['total'] ?? 0);
+    if ($total <= 0) continue;
+    $id = (string) ($o['id'] ?? '');
+    $number = (string) ($o['number'] ?? '');
+    $name = (string) ($o['clientName'] ?? '');
+    $when = (string) ($o['orderedAt'] ?? '');
+    $date = preg_match('/^\d{4}-\d{2}-\d{2}/', $when) ? substr($when, 0, 10) : date('Y-m-d');
+    $pay = trim((string) ($o['payment'] ?? ''));
+    $desc = trim('Reserva ' . $number . ($name !== '' ? ' · ' . $name : '') . ($pay !== '' ? ' · ' . $pay : ''));
+    $out[] = [
+      'id' => 'fin-' . ($id !== '' ? $id : $number),
+      'type' => 'entrada',
+      'amount' => $total,
+      'description' => $desc,
+      'date' => $date,
+      'orderId' => $id,
+    ];
+  }
+  return $out;
+}
+
+function pudim_merge_finance(array $finance, array $orders): array {
+  $seen = [];
+  $out = [];
+  foreach ($finance as $f) {
+    if (!is_array($f)) continue;
+    $oid = (string) ($f['orderId'] ?? '');
+    $fid = (string) ($f['id'] ?? '');
+    if ($oid !== '') $seen[$oid] = true;
+    if ($fid !== '' && strpos($fid, 'fin-') === 0) {
+      $seen[substr($fid, 4)] = true;
+    }
+    $out[] = $f;
+  }
+  foreach (pudim_finance_from_orders($orders) as $f) {
+    $oid = (string) ($f['orderId'] ?? '');
+    if ($oid !== '' && isset($seen[$oid])) continue;
+    $out[] = $f;
+    if ($oid !== '') $seen[$oid] = true;
+  }
+  return $out;
+}
+
 function pudim_attach_file_orders(array $data): array {
   if (!isset($data['orders']) || !is_array($data['orders'])) {
     $data['orders'] = [];
   }
   $data['orders'] = pudim_merge_file_orders($data['orders']);
+  if (!isset($data['finance']) || !is_array($data['finance'])) {
+    $data['finance'] = [];
+  }
+  $data['finance'] = pudim_merge_finance($data['finance'], $data['orders']);
   return $data;
 }
 
@@ -122,6 +175,7 @@ function pudim_offline_admin_data(): array {
     }
   }
   $base['orders'] = pudim_file_load_reservas();
+  $base['finance'] = pudim_finance_from_orders($base['orders']);
   $base['auth'] = pudim_fallback_auth();
   return $base;
 }

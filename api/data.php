@@ -170,7 +170,8 @@ if ($method === 'POST') {
   if ($actionName === 'list_reservas') {
     $listPass = get_password_header() ?: (string) ($body['password'] ?? '');
     if (!pudim_admin_password_ok($listPass)) json_out(['error' => 'Senha inválida'], 401);
-    json_out(['ok' => true, 'orders' => pudim_file_load_reservas()]);
+    $fileOrders = pudim_file_load_reservas();
+    json_out(['ok' => true, 'orders' => $fileOrders, 'finance' => pudim_finance_from_orders($fileOrders)]);
   }
 
   if ($actionName === 'set_order_status') {
