@@ -625,29 +625,30 @@ label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--c-pri
 .reviews article { background: rgba(255,255,255,0.1); border-radius: var(--radius); padding: 1.3rem; }
 .stars { color: var(--c-secondary); letter-spacing: 0.08em; }
 .reviews p { font-family: var(--font-display); font-size: 1.35rem; line-height: 1.35; margin: 0.7rem 0; }
+
+.contact { background: color-mix(in srgb, var(--c-cream) 60%, transparent); text-align: center; }
+.contact .meta { margin: 1.2rem 0 1.6rem; color: var(--c-muted); display: grid; gap: 0.35rem; }
 .google-rate {
   display: grid;
-  grid-template-columns: 6.4rem 1fr;
-  gap: 1rem;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 1.1rem;
   align-items: center;
-  margin-top: 1.5rem;
-  padding: 1rem 1.15rem;
-  background: rgba(255,255,255,0.12);
+  max-width: 32rem;
+  margin: 1.8rem auto 0;
+  padding: 1.15rem 1.25rem;
+  background: #fff;
   border-radius: var(--radius);
-  color: inherit;
+  box-shadow: 0 10px 24px rgba(90,56,37,0.08);
+  color: var(--c-text);
   text-align: left;
 }
 .google-rate img {
   width: 100%;
   background: #fff;
   border-radius: 0.7rem;
-  padding: 0.3rem;
 }
-.google-rate p { font-family: var(--font); font-size: 0.95rem; margin: 0.15rem 0 0; opacity: 0.9; }
-.google-rate strong { font-family: var(--font); font-size: 1.05rem; }
-
-.contact { background: color-mix(in srgb, var(--c-cream) 60%, transparent); text-align: center; }
-.contact .meta { margin: 1.2rem 0 1.6rem; color: var(--c-muted); display: grid; gap: 0.35rem; }
+.google-rate p { font-family: var(--font); font-size: 0.95rem; margin: 0.2rem 0 0; color: var(--c-muted); }
+.google-rate strong { font-family: var(--font); font-size: 1.08rem; color: var(--c-primary); }
 
 .footer {
   border-top: 1px solid var(--c-line);
