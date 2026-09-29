@@ -1,11 +1,26 @@
 <?php
-$local = __DIR__ . '/config.local.php';
-$example = __DIR__ . '/config.local.example.php';
+$candidates = [
+  __DIR__ . '/config.local.php',
+  dirname(__DIR__) . '/config.local.php',
+  dirname(__DIR__, 2) . '/config.local.php',
+];
 
-if (is_file($local)) {
-  return require $local;
+foreach ($candidates as $path) {
+  if (!is_file($path)) {
+    continue;
+  }
+  $cfg = require $path;
+  if (!is_array($cfg)) {
+    continue;
+  }
+  $pass = (string) ($cfg['pass'] ?? '');
+  if ($pass === '' || $pass === 'COLOQUE_A_SENHA_DO_MYSQL_AQUI') {
+    continue;
+  }
+  return $cfg;
 }
 
+$example = __DIR__ . '/config.local.example.php';
 if (is_file($example)) {
   return require $example;
 }
