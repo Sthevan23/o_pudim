@@ -17,20 +17,22 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 require_once __DIR__ . '/mysql_store.php';
+require_once __DIR__ . '/reserva_file.php';
 
 $password = $_SERVER['HTTP_X_ADMIN_PASSWORD'] ?? '';
-
+$ok = false;
 try {
   $pdo = pudim_db();
   $auth = pudim_get_auth($pdo);
+  $authPass = (string) ($auth['password'] ?? '');
+  $ok = $password !== '' && $authPass !== '' && hash_equals($authPass, $password);
 } catch (Throwable $e) {
-  http_response_code(500);
-  echo json_encode(['error' => 'Falha na conexão MySQL', 'detail' => $e->getMessage()]);
-  exit;
+  $ok = false;
 }
-
-$authPass = (string) ($auth['password'] ?? '');
-if ($password === '' || $authPass === '' || !hash_equals($authPass, $password)) {
+if (!$ok) {
+  $ok = function_exists('pudim_admin_password_ok') && pudim_admin_password_ok((string) $password);
+}
+if (!$ok) {
   http_response_code(401);
   echo json_encode(['error' => 'Senha inválida — saia e entre de novo no admin']);
   exit;
@@ -64,6 +66,10 @@ if ($file['size'] > 8 * 1024 * 1024) {
 }
 
 $dir = pudim_products_dir();
+$folder = (string) ($_POST['folder'] ?? '');
+if ($folder === 'partners') {
+  $dir .= DIRECTORY_SEPARATOR . 'partners';
+}
 if (!is_dir($dir)) @mkdir($dir, 0755, true);
 $name = 'up-' . bin2hex(random_bytes(6)) . '.' . $allowed[$mime];
 $dest = $dir . DIRECTORY_SEPARATOR . $name;
@@ -74,4 +80,5 @@ if (!move_uploaded_file($tmp, $dest)) {
 }
 @chmod($dest, 0644);
 
-echo json_encode(['ok' => true, 'path' => 'products/' . $name]);
+$public = $folder === 'partners' ? ('products/partners/' . $name) : ('products/' . $name);
+echo json_encode(['ok' => true, 'path' => $public]);

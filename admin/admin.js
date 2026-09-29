@@ -40,6 +40,7 @@ function showPage(id) {
     analise: "Análise",
     pedidos: "Pedidos",
     produtos: "Produtos",
+    parceiros: "Parceiros",
     clientes: "Clientes",
     financeiro: "Financeiro",
     config: "Configurações",
@@ -193,6 +194,7 @@ function renderAll() {
   document.getElementById("s-hide").checked = s.hidePrices !== false;
   document.getElementById("s-natal").checked = s.showNatal !== false;
   document.getElementById("p-cat").innerHTML = Storage.getCategories().map((c) => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
+  renderPartners();
 }
 
 function openProduct(product) {
@@ -210,6 +212,84 @@ function openProduct(product) {
   document.getElementById("product-modal").classList.add("active");
 }
 
+function partnerUid() {
+  return "pt-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function withPartnerIds(list) {
+  return (list || []).map((p, i) => ({
+    id: p.id || ("pt-" + String(p.name || "parceiro").toLowerCase().replace(/[^a-z0-9]+/gi, "").slice(0, 16) + "-" + i),
+    name: p.name || "",
+    logo: p.logo || "",
+  }));
+}
+
+function currentPartners() {
+  const p = Storage.getPartners();
+  return {
+    pudins: withPartnerIds(p.pudins),
+    gelatos: withPartnerIds(p.gelatos),
+  };
+}
+
+function partnerRow(p, group) {
+  const logo = p.logo
+    ? `<img src="${imgSrc(p.logo)}" alt="">`
+    : `<span class="partner-admin-card__empty">Só nome</span>`;
+  return `
+    <article class="partner-admin-card">
+      ${logo}
+      <div>
+        <strong>${escapeHtml(p.name)}</strong>
+        <small>${p.logo ? "Com logo" : "Lista “Também em”"}</small>
+      </div>
+      <div class="table__actions">
+        <button class="btn btn--secondary btn--sm" type="button" data-pt-edit="${escapeHtml(p.id)}" data-pt-group="${group}">Editar</button>
+        <button class="btn btn--danger btn--sm" type="button" data-pt-del="${escapeHtml(p.id)}" data-pt-group="${group}">Tirar</button>
+      </div>
+    </article>`;
+}
+
+function renderPartners() {
+  const p = currentPartners();
+  const pud = document.getElementById("partners-pudins-body");
+  const gel = document.getElementById("partners-gelatos-body");
+  if (pud) pud.innerHTML = p.pudins.map((x) => partnerRow(x, "pudins")).join("") || emptyHtml("Nenhum parceiro de pudim.");
+  if (gel) gel.innerHTML = p.gelatos.map((x) => partnerRow(x, "gelatos")).join("") || emptyHtml("Nenhum parceiro de gelato.");
+}
+
+function setPartnerPreview(path) {
+  const img = document.getElementById("pt-preview");
+  if (!img) return;
+  if (!path) {
+    img.hidden = true;
+    img.removeAttribute("src");
+    return;
+  }
+  img.hidden = false;
+  img.src = imgSrc(path);
+}
+
+function openPartner(partner, group) {
+  document.getElementById("pt-id").value = partner?.id || "";
+  document.getElementById("pt-orig-group").value = group || "pudins";
+  document.getElementById("pt-name").value = partner?.name || "";
+  document.getElementById("pt-group").value = group || "pudins";
+  document.getElementById("pt-logo").value = partner?.logo || "";
+  document.getElementById("pt-file").value = "";
+  setPartnerPreview(partner?.logo || "");
+  document.getElementById("pt-modal-title").textContent = partner ? "Editar parceiro" : "Novo parceiro";
+  document.getElementById("partner-modal").classList.add("active");
+}
+
+async function persistPartners(next) {
+  await Storage.savePartnersAsync({
+    pudins: next.pudins.map(({ id, name, logo }) => (logo ? { id, name, logo } : { id, name })),
+    gelatos: next.gelatos.map(({ id, name, logo }) => (logo ? { id, name, logo } : { id, name })),
+  });
+  renderAll();
+}
+
 document.getElementById("sidebar-toggle").onclick = toggleSidebar;
 overlay.onclick = closeSidebar;
 document.querySelectorAll("[data-page]").forEach((a) => a.addEventListener("click", (e) => {
@@ -221,9 +301,15 @@ document.getElementById("logout").onclick = () => {
   location.href = "login.html";
 };
 document.getElementById("new-product").onclick = () => openProduct(null);
+document.getElementById("new-partner-pudins").onclick = () => openPartner(null, "pudins");
+document.getElementById("new-partner-gelatos").onclick = () => openPartner(null, "gelatos");
 document.getElementById("modal-close").onclick = () => document.getElementById("product-modal").classList.remove("active");
+document.getElementById("pt-modal-close").onclick = () => document.getElementById("partner-modal").classList.remove("active");
 document.getElementById("product-modal").addEventListener("click", (e) => {
   if (e.target.id === "product-modal") e.target.classList.remove("active");
+});
+document.getElementById("partner-modal").addEventListener("click", (e) => {
+  if (e.target.id === "partner-modal") e.target.classList.remove("active");
 });
 document.getElementById("admin-email").textContent = sessionStorage.getItem("admin_email") || "";
 
@@ -278,6 +364,71 @@ document.getElementById("p-file").addEventListener("change", async (e) => {
     toast("Foto enviada");
   } catch (err) {
     toast(err.message || "Falha no upload");
+  }
+});
+
+document.getElementById("pt-file").addEventListener("change", async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  try {
+    const path = await Storage.uploadImage(file, "partners");
+    document.getElementById("pt-logo").value = path;
+    setPartnerPreview(path);
+    toast("Logo enviada");
+  } catch (err) {
+    toast(err.message || "Falha no upload");
+  }
+});
+
+document.getElementById("pt-clear-logo").onclick = () => {
+  document.getElementById("pt-logo").value = "";
+  document.getElementById("pt-file").value = "";
+  setPartnerPreview("");
+};
+
+document.getElementById("page-parceiros").addEventListener("click", async (e) => {
+  const edit = e.target.closest("[data-pt-edit]");
+  const del = e.target.closest("[data-pt-del]");
+  if (edit) {
+    const group = edit.dataset.ptGroup;
+    const found = currentPartners()[group]?.find((x) => x.id === edit.dataset.ptEdit);
+    openPartner(found, group);
+    return;
+  }
+  if (!del) return;
+  if (!confirm("Tirar este parceiro do site?")) return;
+  try {
+    const group = del.dataset.ptGroup;
+    const next = currentPartners();
+    next[group] = next[group].filter((x) => x.id !== del.dataset.ptDel);
+    await persistPartners(next);
+    toast("Parceiro removido");
+  } catch (err) {
+    toast(err.message || "Não foi possível remover");
+  }
+});
+
+document.getElementById("partner-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("pt-name").value.trim();
+  if (!name) {
+    toast("Informe o nome do parceiro");
+    return;
+  }
+  const id = document.getElementById("pt-id").value || partnerUid();
+  const group = document.getElementById("pt-group").value === "gelatos" ? "gelatos" : "pudins";
+  const logo = document.getElementById("pt-logo").value.trim();
+  const item = logo ? { id, name, logo } : { id, name };
+  try {
+    const next = currentPartners();
+    next.pudins = next.pudins.filter((x) => x.id !== id);
+    next.gelatos = next.gelatos.filter((x) => x.id !== id);
+    next[group].push(item);
+    await persistPartners(next);
+    document.getElementById("partner-modal").classList.remove("active");
+    toast("Parceiro salvo no site");
+  } catch (err) {
+    toast(err.message || "Não foi possível salvar o parceiro");
   }
 });
 

@@ -8,7 +8,7 @@
   <link rel="icon" href="../products/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="admin.css?v=7">
+  <link rel="stylesheet" href="admin.css?v=8">
   <script>if (sessionStorage.getItem("admin_logged") !== "true") location.replace("login.html");</script>
 </head>
 <body>
@@ -20,6 +20,7 @@
       <a href="#" class="sidebar__link" data-page="analise"><i class="fas fa-chart-bar"></i> Análise</a>
       <a href="#" class="sidebar__link" data-page="pedidos"><i class="fas fa-shopping-bag"></i> Pedidos</a>
       <a href="#" class="sidebar__link" data-page="produtos"><i class="fas fa-ice-cream"></i> Produtos</a>
+      <a href="#" class="sidebar__link" data-page="parceiros"><i class="fas fa-handshake"></i> Parceiros</a>
       <a href="#" class="sidebar__link" data-page="clientes"><i class="fas fa-users"></i> Clientes</a>
       <a href="#" class="sidebar__link" data-page="financeiro"><i class="fas fa-chart-line"></i> Financeiro</a>
       <a href="#" class="sidebar__link" data-page="config"><i class="fas fa-cog"></i> Configurações</a>
@@ -100,6 +101,26 @@
       </div>
     </section>
 
+    <section class="admin-page" id="page-parceiros">
+      <p class="fin-note">Com foto, o parceiro aparece em destaque. Sem foto, entra na lista <strong>Também em</strong>.</p>
+      <div class="partners-admin">
+        <div>
+          <div class="toolbar">
+            <h2 class="section-title" style="margin:0">Pudins</h2>
+            <button class="btn btn--primary" type="button" id="new-partner-pudins"><i class="fas fa-plus"></i> Novo parceiro</button>
+          </div>
+          <div class="partner-admin-list" id="partners-pudins-body"></div>
+        </div>
+        <div>
+          <div class="toolbar">
+            <h2 class="section-title" style="margin:0">Picolés, IceDim e Gelatos</h2>
+            <button class="btn btn--primary" type="button" id="new-partner-gelatos"><i class="fas fa-plus"></i> Novo parceiro</button>
+          </div>
+          <div class="partner-admin-list" id="partners-gelatos-body"></div>
+        </div>
+      </div>
+    </section>
+
     <section class="admin-page" id="page-clientes">
       <div class="table-wrap"><table><thead><tr><th>Nome</th><th>WhatsApp</th><th>E-mail</th></tr></thead><tbody id="clients-body"></tbody></table></div>
     </section>
@@ -155,10 +176,40 @@
       </form>
     </div>
   </div>
+  <div class="modal" id="partner-modal">
+    <div class="modal__box">
+      <h3 id="pt-modal-title">Parceiro</h3>
+      <form id="partner-form">
+        <input type="hidden" id="pt-id">
+        <input type="hidden" id="pt-orig-group">
+        <div class="form-grid">
+          <div class="form-group"><label>Nome</label><input id="pt-name" required placeholder="Ex.: Restaurante do Taioba" spellcheck="false" lang="pt-BR"></div>
+          <div class="form-group"><label>Onde aparece</label>
+            <select id="pt-group">
+              <option value="pudins">Pudins</option>
+              <option value="gelatos">Picolés, IceDim e Gelatos</option>
+            </select>
+          </div>
+          <div class="form-group full"><label>Caminho da logo</label><input id="pt-logo" placeholder="Deixe vazio para aparecer só o nome" spellcheck="false"></div>
+          <div class="form-group full">
+            <label>Enviar logo</label>
+            <input id="pt-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp">
+            <small class="field-hint">JPG ou PNG. Sem logo, o nome vai para “Também em”.</small>
+            <img id="pt-preview" class="prod-photo-preview" alt="Prévia" hidden>
+            <button type="button" class="btn btn--secondary btn--sm" id="pt-clear-logo" style="margin-top:8px">Tirar logo</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px">
+          <button type="button" class="btn btn--secondary" id="pt-modal-close">Cancelar</button>
+          <button class="btn btn--primary" type="submit">Salvar no site</button>
+        </div>
+      </form>
+    </div>
+  </div>
   <div class="toast" id="toast"></div>
 
   <script src="../js/default-data.js?v=6"></script>
-  <script src="../js/storage.js?v=4"></script>
-  <script src="admin.js?v=9"></script>
+  <script src="../js/storage.js?v=5"></script>
+  <script src="admin.js?v=10"></script>
 </body>
 </html>

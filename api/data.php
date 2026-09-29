@@ -20,6 +20,7 @@ if (
   && !isset($_GET['full'])
   && (($_GET['action'] ?? '') !== 'full')
   && (($_GET['action'] ?? '') !== 'visits')
+  && (($_GET['action'] ?? '') !== 'partners')
 ) {
   $catalogFile = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'catalog.json';
   if (is_file($catalogFile)) {
@@ -34,6 +35,7 @@ if (
 
 require_once __DIR__ . '/mysql_store.php';
 require_once __DIR__ . '/reserva_file.php';
+require_once __DIR__ . '/partners_store.php';
 
 function json_out($payload, int $code = 200): void {
   http_response_code($code);
@@ -61,6 +63,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
 if ($method === 'GET') {
+  if ($action === 'partners') {
+    header('Cache-Control: no-store, max-age=0');
+    json_out(['ok' => true, 'partners' => pudim_load_partners()]);
+  }
+
   $pdo = db_or_fail();
   $password = get_password_header();
 
@@ -187,6 +194,20 @@ if ($method === 'POST') {
       }
     } catch (Throwable $e) { /* arquivo já atualizou */ }
     json_out(['ok' => true, 'id' => $orderId, 'status' => $status]);
+  }
+
+  if ($actionName === 'save_partners') {
+    $partPass = get_password_header() ?: (string) ($body['password'] ?? '');
+    if (!pudim_admin_password_ok($partPass)) json_out(['error' => 'Senha inválida'], 401);
+    try {
+      $saved = pudim_save_partners($body['partners'] ?? []);
+    } catch (Throwable $e) {
+      json_out(['error' => 'Não foi possível salvar os parceiros.', 'detail' => $e->getMessage()], 500);
+    }
+    try {
+      pudim_write_public_catalog(pudim_db());
+    } catch (Throwable $e) { /* catalog.json já tem os parceiros */ }
+    json_out(['ok' => true, 'partners' => $saved]);
   }
 
   $pdo = db_or_fail();

@@ -132,6 +132,7 @@ function pudim_load_all(PDO $pdo, string $mode = 'full'): ?array {
     'orders' => [],
     'finance' => [],
     'auth' => ['email' => '', 'password' => ''],
+    'partners' => function_exists('pudim_load_partners') ? pudim_load_partners() : ['pudins' => [], 'gelatos' => []],
   ];
 
   if ($mode === 'public') {
@@ -450,6 +451,9 @@ function pudim_public_payload(array $data): array {
 function pudim_write_public_catalog(PDO $pdo): bool {
   $data = pudim_load_all($pdo, 'public');
   if ($data === null) return false;
+  if (function_exists('pudim_load_partners')) {
+    $data['partners'] = pudim_load_partners();
+  }
   $json = json_encode(pudim_public_payload($data), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
   if (!is_string($json) || $json === '') return false;
   $ok = @file_put_contents(pudim_catalog_path(), $json) !== false;

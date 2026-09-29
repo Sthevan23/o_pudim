@@ -64,6 +64,10 @@ const Storage = (() => {
     try {
       const data = await fetchJson(CATALOG + (CATALOG.includes('?') ? '&' : '?') + 't=' + Date.now());
       if (data && Array.isArray(data.products)) {
+        try {
+          const extra = await fetchJson(API + (API.includes('?') ? '&' : '?') + 'action=partners&t=' + Date.now());
+          if (extra && extra.partners) data.partners = extra.partners;
+        } catch { /* catalog já tem o fallback */ }
         try { localStorage.setItem(PUBLIC_CACHE_KEY, JSON.stringify({ ...data, savedAt: Date.now() })); } catch { /* ignore */ }
         const merged = { ...emptyStore(), ...data, products: data.products, settings: { ...emptyStore().settings, ...(data.settings || {}) } };
         memoryData = merged;
@@ -110,6 +114,10 @@ const Storage = (() => {
       const data = await fetchJson(API + (API.includes('?') ? '&' : '?') + 'full=1', {
         headers: { 'X-Admin-Password': password },
       });
+      try {
+        const extra = await fetchJson(API + (API.includes('?') ? '&' : '?') + 'action=partners&t=' + Date.now());
+        if (extra && extra.partners) data.partners = extra.partners;
+      } catch { /* usa os do catalog */ }
       setMemory(data);
       cloudEnabled = true;
       return data;
@@ -126,6 +134,10 @@ const Storage = (() => {
         });
         const data = getData();
         if (Array.isArray(file.orders)) data.orders = file.orders;
+        try {
+          const extra = await fetchJson(API + (API.includes('?') ? '&' : '?') + 'action=partners&t=' + Date.now());
+          if (extra && extra.partners) data.partners = extra.partners;
+        } catch { /* ignore */ }
         setMemory(data);
         return data;
       } catch {
@@ -191,9 +203,10 @@ const Storage = (() => {
     return res;
   }
 
-  async function uploadImage(file) {
+  async function uploadImage(file, folder) {
     const form = new FormData();
     form.append('image', file);
+    if (folder) form.append('folder', folder);
     const res = await fetch(UPLOAD, {
       method: 'POST',
       headers: { 'X-Admin-Password': adminPassword() },
@@ -202,6 +215,23 @@ const Storage = (() => {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || 'Falha no upload');
     return data.path;
+  }
+
+  async function savePartnersAsync(partners) {
+    const res = await postAction({ action: 'save_partners', partners, password: adminPassword() });
+    const data = getData();
+    data.partners = res.partners || partners;
+    setMemory(data);
+    return res;
+  }
+
+  function getPartners() {
+    const p = getData().partners;
+    if (p && (Array.isArray(p.pudins) || Array.isArray(p.gelatos))) {
+      return { pudins: p.pudins || [], gelatos: p.gelatos || [] };
+    }
+    const d = (typeof OPUDIM_DEFAULT_DATA !== 'undefined' && OPUDIM_DEFAULT_DATA.partners) || {};
+    return { pudins: d.pudins || [], gelatos: d.gelatos || [] };
   }
 
   async function publishCatalogAsync() {
@@ -272,6 +302,7 @@ const Storage = (() => {
     API, loadCatalog, loginAsync, initCloud, saveProductAsync, deleteProductAsync,
     setProductActiveAsync, saveAllAsync, createOrderAsync, setOrderStatusAsync,
     uploadImage, publishCatalogAsync, getVisitStatsAsync, pingVisit,
+    savePartnersAsync, getPartners,
     getData, getSettings, getProducts, getAllProducts, getCategories,
     getGallery, getReviews, getOrders, getClients, getFinance, isCloudEnabled,
     productDisplayPrice, categoryName, waLink, setMemory, getDataStore: getData,

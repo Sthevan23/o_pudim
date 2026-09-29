@@ -18,7 +18,9 @@
   }
 
   function partnerCard(partner) {
-    const name = partner.name || "";
+    const name = String(partner.name || "").replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    }[c]));
     if (partner.logo) {
       return `
         <article class="partner-card">
@@ -35,7 +37,7 @@
     const chipsEl = chipsId ? document.getElementById(chipsId) : null;
     if (logosEl) {
       const logos = items.filter((p) => p.logo);
-      if (logos.length) logosEl.innerHTML = logos.map(partnerCard).join("");
+      if (logosEl) logosEl.innerHTML = logos.map(partnerCard).join("");
     }
     if (chipsEl) {
       chipsEl.innerHTML = items.filter((p) => !p.logo).map(partnerCard).join("");
