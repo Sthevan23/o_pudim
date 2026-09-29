@@ -359,10 +359,12 @@ h1, h2, h3, p { margin: 0; }
   grid-template-columns: 5.6rem 1fr;
   gap: 0.85rem;
   align-items: center;
-  margin-top: 0.35rem;
+  margin-top: 0.85rem;
   font-size: 0.88rem;
   color: var(--c-muted);
 }
+.seed-unmold--link { color: inherit; text-decoration: none; }
+.seed-unmold--link:hover .seed-qr { box-shadow: 0 10px 22px rgba(90, 56, 37, 0.16); }
 .seed-qr {
   display: block;
   background: #fff;
@@ -625,25 +627,6 @@ label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--c-pri
 .reviews article { background: rgba(255,255,255,0.1); border-radius: var(--radius); padding: 1.3rem; }
 .stars { color: var(--c-secondary); letter-spacing: 0.08em; }
 .reviews p { font-family: var(--font-display); font-size: 1.35rem; line-height: 1.35; margin: 0.7rem 0; }
-.reviews .gift--google {
-  max-width: 22rem;
-  margin: 1.6rem auto 0;
-  text-align: center;
-  color: var(--c-text);
-  background: #fff;
-  box-shadow: 0 14px 32px rgba(0,0,0,0.18);
-}
-.reviews .gift--google h3 { color: var(--c-primary); margin-top: 0.2rem; }
-.reviews .gift--google p {
-  font-family: var(--font);
-  font-size: 0.92rem;
-  color: var(--c-muted);
-  margin: 0;
-}
-.seed-qr--lg {
-  width: 9.5rem;
-  margin: 0.15rem auto 0.7rem;
-}
 
 .contact { background: color-mix(in srgb, var(--c-cream) 60%, transparent); text-align: center; }
 .contact .meta { margin: 1.2rem 0 1.6rem; color: var(--c-muted); display: grid; gap: 0.35rem; }
