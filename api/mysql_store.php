@@ -229,8 +229,40 @@ function pudim_load_reservas(PDO $pdo): array {
   return $out;
 }
 
+function pudim_ensure_reservas_natal(PDO $pdo): void {
+  static $done = false;
+  if ($done) return;
+  $done = true;
+  if (pudim_table_exists($pdo, 'reservas_natal')) return;
+  try {
+    $pdo->exec(
+      "CREATE TABLE reservas_natal (
+        id VARCHAR(64) NOT NULL,
+        number VARCHAR(40) NOT NULL,
+        customer_name VARCHAR(190) NOT NULL,
+        phone VARCHAR(30) NOT NULL,
+        qty INT NOT NULL DEFAULT 1,
+        payment VARCHAR(40) NOT NULL,
+        desired_date VARCHAR(20) NOT NULL,
+        receive_method VARCHAR(120) NOT NULL,
+        product_id VARCHAR(64) NOT NULL DEFAULT 'p-natal',
+        product_name VARCHAR(190) NOT NULL DEFAULT 'Pudim Tradicional Família',
+        price DECIMAL(10,2) NOT NULL DEFAULT 65.00,
+        total DECIMAL(10,2) NOT NULL DEFAULT 65.00,
+        status ENUM('novo','confirmado','entregue','cancelado') NOT NULL DEFAULT 'novo',
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uk_reservas_natal_number (number),
+        KEY idx_reservas_natal_status (status),
+        KEY idx_reservas_natal_phone (phone)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
+  } catch (Throwable $e) { /* sem permissão CREATE */ }
+}
+
 function pudim_create_reserva(PDO $pdo, array $reserva): array {
   pudim_ensure_show_natal($pdo);
+  pudim_ensure_reservas_natal($pdo);
   try {
     $show = $pdo->query('SELECT show_natal FROM settings WHERE id = 1 LIMIT 1')->fetchColumn();
     if ($show !== false && (int) $show !== 1) {

@@ -57,7 +57,10 @@
         body: JSON.stringify(payload),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.ok) throw new Error(data.error || "Não foi possível gravar a reserva.");
+      if (!res.ok || !data.ok) {
+        const why = data.detail || data.error || "Não foi possível gravar a reserva.";
+        throw new Error(why);
+      }
       NatalCart.write(0);
       document.getElementById("checkout-box").innerHTML = `
         <h2>Reserva confirmada</h2>
@@ -65,8 +68,24 @@
         <p style="margin-top:1rem"><a class="btn btn--primary" href="index.html">Voltar ao site</a></p>`;
       render();
     } catch (err) {
+      const name = payload.reserva.customerName;
+      const phone = payload.reserva.phone;
+      const pay = payload.reserva.payment;
+      const date = payload.reserva.desiredDate;
+      const receive = payload.reserva.receiveMethod;
+      const total = NatalCart.total().toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+      const text = [
+        "Reserva de Natal O! Pudim",
+        `${qty}x Pudim Tradicional Família — ${total}`,
+        `Nome: ${name}`,
+        `WhatsApp: ${phone}`,
+        `Pagamento: ${pay}`,
+        `Data: ${date}`,
+        `Receber: ${receive}`,
+      ].join("\n");
+      window.open(Storage.waLink(text), "_blank", "noopener");
       msg.hidden = false;
-      msg.textContent = err.message || "Falha ao enviar. Importe api/reservas_natal.sql no phpMyAdmin.";
+      msg.textContent = "O banco ainda não está ligado no servidor. Abrimos o WhatsApp com a reserva para não perder o pedido.";
       btn.disabled = false;
     }
   });
