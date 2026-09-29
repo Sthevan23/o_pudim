@@ -57,32 +57,223 @@ function prettyPhone(raw) {
   return String(raw || "").trim();
 }
 
-function orderCard(o) {
-  const rows = [];
-  const items = (o.items || []).map((i) => `${i.qty}x ${i.name}`).join(", ");
-  if (items) rows.push(["Pedido", items]);
-  if (o.clientName) rows.push(["Nome", o.clientName]);
-  if (o.clientWhatsapp) rows.push(["WhatsApp", prettyPhone(o.clientWhatsapp)]);
-  if (o.payment) rows.push(["Pagamento", o.payment]);
-  if (o.desiredDate) rows.push(["Data", o.desiredDate]);
-  if (o.receiveMethod) rows.push(["Receber", o.receiveMethod]);
-  if (o.deliveryAddress) rows.push(["Endereço", o.deliveryAddress]);
-  const meta = rows.length
-    ? `<div class="order-meta">${rows.map(([k, v]) => `<div><span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong></div>`).join("")}</div>`
-    : `${o.notes ? `<small>${escapeHtml(o.notes)}</small>` : ""}`;
+const STATUS_LIST = ["novo", "preparo", "entrega", "finalizado", "cancelado"];
+const STATUS_LABELS = {
+  novo: "Novo",
+  preparo: "Em preparo",
+  entrega: "Saiu p/ entrega",
+  finalizado: "Finalizado",
+  cancelado: "Cancelado",
+};
+let orderFilter = "all";
+
+function orderWhen(o) {
+  return o?.orderedAt || o?.date || o?.desiredDate || "";
+}
+
+function statusBadge(status) {
+  const key = STATUS_LIST.includes(status) ? status : "novo";
+  return `<span class="badge badge--${key}">${STATUS_LABELS[key] || status}</span>`;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return String(dateStr);
+  return d.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function digitsPhone(phone) {
+  return String(phone || "").replace(/\D/g, "");
+}
+
+function whatsappHref(phone) {
+  const digits = digitsPhone(phone);
+  if (!digits) return "";
+  return "https://wa.me/" + (digits.startsWith("55") ? digits : "55" + digits);
+}
+
+function whatsappTableLink(phone) {
+  const href = whatsappHref(phone);
+  if (!href) return "";
+  return `<a class="order-whatsapp-inline" href="${href}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> ${escapeHtml(prettyPhone(phone))}</a>`;
+}
+
+function whatsappLink(phone) {
+  const href = whatsappHref(phone);
+  if (!href) return "";
+  return `<a class="order-whatsapp-link" href="${href}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> <span>${escapeHtml(prettyPhone(phone))}</span></a>`;
+}
+
+function itemsLabel(o) {
+  const n = (o.items || []).length;
+  return n ? `${n} item(s)` : "—";
+}
+
+function sortOrdersNewestFirst(orders) {
+  return (orders || []).slice().sort((a, b) => {
+    const tb = new Date(orderWhen(b) || 0).getTime();
+    const ta = new Date(orderWhen(a) || 0).getTime();
+    if (Number.isFinite(tb) && Number.isFinite(ta) && tb !== ta) return tb - ta;
+    return String(b.number || "").localeCompare(String(a.number || ""), "pt-BR");
+  });
+}
+
+function isOrderToday(dateStr) {
+  if (!dateStr) return false;
+  const now = new Date();
+  const iso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  if (String(dateStr).slice(0, 10) === iso) return true;
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return false;
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+}
+
+function orderRow(o) {
+  const id = escapeHtml(o.id);
   return `
-    <article class="order-card">
-      <div class="order-card__top">
-        <div>
-          <strong>${escapeHtml(o.number || "-")}</strong>
+    <tr class="order-row" data-view-order="${id}" title="Ver detalhes do pedido">
+      <td data-label="Nº"><strong>${escapeHtml(o.number || "-")}</strong></td>
+      <td data-label="Cliente">
+        ${escapeHtml(o.clientName || "—")}
+        ${o.clientWhatsapp ? `<br>${whatsappTableLink(o.clientWhatsapp)}` : ""}
+      </td>
+      <td data-label="Itens">${itemsLabel(o)}</td>
+      <td data-label="Valor">${money(o.total)}</td>
+      <td data-label="Status">${statusBadge(o.status)}</td>
+      <td data-label="Data">${escapeHtml(formatDate(orderWhen(o)))}</td>
+      <td data-label="Ações">
+        <div class="table__actions">
+          <button type="button" class="btn--icon edit" data-view-order="${id}" title="Ver detalhes"><i class="fas fa-eye"></i></button>
         </div>
-        <strong>${money(o.total)}</strong>
+      </td>
+    </tr>`;
+}
+
+function renderOrders() {
+  let orders = sortOrdersNewestFirst(Storage.getOrders());
+  if (orderFilter === "today") {
+    orders = orders.filter((o) => isOrderToday(orderWhen(o)));
+  } else if (orderFilter !== "all") {
+    orders = orders.filter((o) => o.status === orderFilter);
+  }
+  const tbody = document.getElementById("orders-body");
+  if (!tbody) return;
+  if (!orders.length) {
+    const emptyMsg = orderFilter === "today"
+      ? "Nenhum pedido registrado hoje."
+      : "Nenhum pedido neste filtro.";
+    tbody.innerHTML = `<tr><td colspan="7" class="table__empty">${emptyMsg}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = orders.map(orderRow).join("");
+}
+
+function renderDashOrders() {
+  const orders = sortOrdersNewestFirst(Storage.getOrders());
+  const recent = orders.slice(0, 8);
+  const tbody = document.getElementById("dash-orders");
+  if (tbody) {
+    tbody.innerHTML = recent.length
+      ? recent.map((o) => `
+        <tr class="order-row" data-view-order="${escapeHtml(o.id)}" title="Ver detalhes do pedido">
+          <td><strong>${escapeHtml(o.number || "-")}</strong></td>
+          <td>${escapeHtml(o.clientName || "—")}</td>
+          <td>${(o.items || []).map((i) => `${i.qty}x ${escapeHtml(i.name)}`).join(", ") || "—"}</td>
+          <td>${money(o.total)}</td>
+          <td>${statusBadge(o.status)}</td>
+        </tr>`).join("")
+      : `<tr><td colspan="5" class="table__empty">Nenhum pedido ainda.</td></tr>`;
+  }
+  const statusColors = { novo: "#2196F3", preparo: "#FF9800", entrega: "#9C27B0", finalizado: "#4CAF50", cancelado: "#F44336" };
+  const max = Math.max(...STATUS_LIST.map((s) => orders.filter((o) => o.status === s).length), 1);
+  const summary = document.getElementById("status-summary");
+  if (summary) {
+    summary.innerHTML = STATUS_LIST.map((s) => {
+      const count = orders.filter((o) => o.status === s).length;
+      const pct = (count / max) * 100;
+      return `<div class="status-item">
+        <span>${STATUS_LABELS[s]}</span>
+        <div class="status-item__bar"><div class="status-item__bar-fill" style="width:${pct}%;background:${statusColors[s]}"></div></div>
+        <strong>${count}</strong>
+      </div>`;
+    }).join("");
+  }
+}
+
+function closeOrderModal() {
+  document.getElementById("order-modal")?.classList.remove("active");
+}
+
+function viewOrder(id) {
+  const order = Storage.getOrders().find((o) => String(o.id) === String(id));
+  if (!order) return;
+  const itemsHtml = (order.items || []).map((item) => {
+    const subtotal = (Number(item.price) || 0) * (Number(item.qty) || 1);
+    return `<article class="order-detail__item">
+      <h4>${escapeHtml(item.name || "")}</h4>
+      <div class="order-detail__meta">
+        <span><strong>Qtd:</strong> ${escapeHtml(item.qty ?? 1)}</span>
+        ${item.price != null && item.price !== "" ? `<span><strong>Unitário:</strong> ${money(item.price)}</span>` : ""}
+        <span><strong>Subtotal:</strong> ${money(subtotal)}</span>
       </div>
-      ${meta}
-      <select data-status="${escapeHtml(o.id)}">
-        ${["novo","preparo","entrega","finalizado","cancelado"].map((s) => `<option value="${s}" ${o.status === s ? "selected" : ""}>${s}</option>`).join("")}
-      </select>
     </article>`;
+  }).join("") || `<p class="order-detail__notes">Sem itens listados.</p>`;
+
+  const box = document.getElementById("order-modal-box");
+  if (!box) return;
+  box.innerHTML = `
+    <h3>Pedido ${escapeHtml(order.number || "")}</h3>
+    <div class="order-detail">
+      <div class="order-detail__header">
+        <div>${statusBadge(order.status)}</div>
+        <p><i class="fas fa-clock"></i> ${escapeHtml(formatDate(orderWhen(order)))}</p>
+      </div>
+      <div class="order-detail__client">
+        <h4><i class="fas fa-user"></i> Cliente</h4>
+        <p><strong>${escapeHtml(order.clientName || "—")}</strong></p>
+        ${whatsappLink(order.clientWhatsapp)}
+        ${order.payment ? `<p><i class="fas fa-credit-card"></i> ${escapeHtml(order.payment)}</p>` : ""}
+        ${order.desiredDate ? `<p><i class="fas fa-calendar"></i> Entrega/retirada: ${escapeHtml(order.desiredDate)}</p>` : ""}
+        ${order.receiveMethod ? `<p><i class="fas fa-truck"></i> ${escapeHtml(order.receiveMethod)}</p>` : ""}
+        ${order.deliveryAddress ? `<p><i class="fas fa-map-marker-alt"></i> ${escapeHtml(order.deliveryAddress)}</p>` : ""}
+        ${order.notes ? `<p class="order-detail__notes">${escapeHtml(order.notes)}</p>` : ""}
+      </div>
+      <h4><i class="fas fa-ice-cream"></i> Itens do pedido</h4>
+      <div class="order-detail__items">${itemsHtml}</div>
+      <div class="order-detail__total">
+        <span>Total do pedido</span>
+        <strong>${money(order.total)}</strong>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label>Status</label>
+        <select data-status="${escapeHtml(order.id)}">
+          ${STATUS_LIST.map((s) => `<option value="${s}" ${order.status === s ? "selected" : ""}>${STATUS_LABELS[s]}</option>`).join("")}
+        </select>
+      </div>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--secondary" id="order-modal-close">Fechar</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("order-modal").classList.add("active");
+}
+
+function initOrderFilters() {
+  document.getElementById("order-status-tabs")?.addEventListener("click", (e) => {
+    const tab = e.target.closest(".filter-tab");
+    if (!tab) return;
+    document.querySelectorAll("#order-status-tabs .filter-tab").forEach((t) => t.classList.remove("active"));
+    tab.classList.add("active");
+    orderFilter = tab.dataset.status || "all";
+    renderOrders();
+  });
 }
 
 function setPreview(path) {
@@ -185,8 +376,8 @@ function renderAll() {
   document.getElementById("stat-clients").textContent = String(clients.length);
   document.getElementById("stat-products").textContent = String(products.filter((p) => p.active !== false).length);
 
-  document.getElementById("dash-orders").innerHTML = orders.slice(0, 5).map(orderCard).join("") || emptyHtml("Nenhum pedido ainda.");
-  document.getElementById("orders-body").innerHTML = orders.map(orderCard).join("") || emptyHtml("Nenhum pedido ainda.");
+  renderDashOrders();
+  renderOrders();
 
   document.getElementById("products-body").innerHTML = products.map((p) => {
     const onMenu = p.active !== false;
@@ -390,14 +581,47 @@ document.getElementById("products-body").addEventListener("click", async (e) => 
 
 document.body.addEventListener("change", async (e) => {
   const sel = e.target.closest("[data-status]");
-  if (!sel) return;
+  if (!sel || sel.tagName !== "SELECT") return;
   try {
     await Storage.setOrderStatusAsync(sel.dataset.status, sel.value);
     toast("Status atualizado");
+    renderAll();
+    if (document.getElementById("order-modal")?.classList.contains("active")) {
+      viewOrder(sel.dataset.status);
+    }
   } catch (err) {
     toast(err.message || "Falha ao atualizar status");
   }
 });
+
+document.body.addEventListener("click", (e) => {
+  if (e.target.closest("#order-modal-close")) {
+    closeOrderModal();
+    return;
+  }
+  if (e.target.closest("a[href]")) return;
+  const view = e.target.closest("[data-view-order]");
+  if (view) viewOrder(view.dataset.viewOrder);
+});
+
+document.getElementById("order-modal")?.addEventListener("click", (e) => {
+  if (e.target.id === "order-modal") closeOrderModal();
+});
+
+document.getElementById("btn-refresh-orders")?.addEventListener("click", async () => {
+  try {
+    await Storage.initCloud({ full: true });
+    renderAll();
+    toast("Pedidos atualizados");
+  } catch {
+    renderAll();
+    toast("Atualizado neste aparelho");
+  }
+});
+
+initOrderFilters();
+window.viewOrder = viewOrder;
+window.closeOrderModal = closeOrderModal;
 
 document.getElementById("p-file").addEventListener("change", async (e) => {
   const file = e.target.files?.[0];

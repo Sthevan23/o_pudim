@@ -8,7 +8,7 @@
   <link rel="icon" href="../products/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="admin.css?v=8">
+  <link rel="stylesheet" href="admin.css?v=9">
   <script>if (sessionStorage.getItem("admin_logged") !== "true") location.replace("login.html");</script>
 </head>
 <body>
@@ -40,15 +40,32 @@
 
     <section class="admin-page active" id="page-dashboard">
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-card__icon" style="background:#f5e6d3;color:#5a3825"><i class="fas fa-shopping-bag"></i></div><div><span class="stat-card__label">Pedidos</span><strong class="stat-card__value" id="stat-orders">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#e0f2f1;color:#1a6b63"><i class="fas fa-shopping-bag"></i></div><div><span class="stat-card__label">Pedidos</span><strong class="stat-card__value" id="stat-orders">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#e8f5e9;color:#2e7d32"><i class="fas fa-dollar-sign"></i></div><div><span class="stat-card__label">Vendas</span><strong class="stat-card__value" id="stat-sales">R$ 0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#e3f2fd;color:#1565c0"><i class="fas fa-users"></i></div><div><span class="stat-card__label">Clientes</span><strong class="stat-card__value" id="stat-clients">0</strong></div></div>
-        <div class="stat-card"><div class="stat-card__icon" style="background:#fff3e0;color:#ef6c00"><i class="fas fa-ice-cream"></i></div><div><span class="stat-card__label">Produtos ativos</span><strong class="stat-card__value" id="stat-products">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#fff8e1;color:#c9a227"><i class="fas fa-ice-cream"></i></div><div><span class="stat-card__label">Produtos ativos</span><strong class="stat-card__value" id="stat-products">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#ede7f6;color:#5e35b1"><i class="fas fa-user"></i></div><div><span class="stat-card__label">Pessoas hoje</span><strong class="stat-card__value" id="stat-visitors-today">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#e0f7fa;color:#00838f"><i class="fas fa-eye"></i></div><div><span class="stat-card__label">Visitas hoje</span><strong class="stat-card__value" id="stat-views-today">0</strong></div></div>
       </div>
       <h2 class="section-title">Pedidos recentes</h2>
-      <div class="order-list" id="dash-orders"></div>
+      <div class="dashboard-grid">
+        <div class="card" style="margin-top:0">
+          <div class="card__header">
+            <h3>Últimos pedidos</h3>
+            <button type="button" class="btn btn--secondary btn--sm" data-page="pedidos">Ver todos</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table" id="recent-orders-table">
+              <thead><tr><th>Nº</th><th>Cliente</th><th>Itens</th><th>Valor</th><th>Status</th></tr></thead>
+              <tbody id="dash-orders"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card" style="margin-top:0">
+          <div class="card__header"><h3>Status dos pedidos</h3></div>
+          <div class="status-summary" id="status-summary"></div>
+        </div>
+      </div>
     </section>
 
     <section class="admin-page" id="page-analise">
@@ -59,7 +76,7 @@
         <div class="stat-card"><div class="stat-card__icon" style="background:#e8f5e9;color:#2e7d32"><i class="fas fa-users"></i></div><div><span class="stat-card__label">Pessoas em 7 dias</span><strong class="stat-card__value" id="an-visitors-7d">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#fff3e0;color:#ef6c00"><i class="fas fa-chart-line"></i></div><div><span class="stat-card__label">Visitas em 7 dias</span><strong class="stat-card__value" id="an-views-7d">0</strong></div></div>
         <div class="stat-card"><div class="stat-card__icon" style="background:#fce4ec;color:#c2185b"><i class="fas fa-heart"></i></div><div><span class="stat-card__label">Pessoas no total</span><strong class="stat-card__value" id="an-visitors-total">0</strong></div></div>
-        <div class="stat-card"><div class="stat-card__icon" style="background:#f5e6d3;color:#5a3825"><i class="fas fa-globe"></i></div><div><span class="stat-card__label">Visitas no total</span><strong class="stat-card__value" id="an-views-total">0</strong></div></div>
+        <div class="stat-card"><div class="stat-card__icon" style="background:#e0f2f1;color:#1a6b63"><i class="fas fa-globe"></i></div><div><span class="stat-card__label">Visitas no total</span><strong class="stat-card__value" id="an-views-total">0</strong></div></div>
       </div>
       <h2 class="section-title">Últimos 7 dias</h2>
       <div class="table-wrap">
@@ -71,7 +88,32 @@
     </section>
 
     <section class="admin-page" id="page-pedidos">
-      <div class="order-list" id="orders-body"></div>
+      <p class="fin-note"><i class="fas fa-edit"></i> Clique no pedido para ver os dados completos. Use o status para acompanhar: novo, preparo, saiu para entrega, finalizado ou cancelado.</p>
+      <div class="page-actions">
+        <button class="btn btn--secondary" type="button" id="btn-refresh-orders"><i class="fas fa-sync"></i> Atualizar pedidos</button>
+      </div>
+      <div class="card" style="margin-top:0">
+        <div class="card__header">
+          <h3>Gestão de pedidos</h3>
+          <div class="filter-tabs" id="order-status-tabs">
+            <button class="filter-tab active" type="button" data-status="all">Todos</button>
+            <button class="filter-tab" type="button" data-status="today">Pedidos de hoje</button>
+            <button class="filter-tab" type="button" data-status="novo">Novo</button>
+            <button class="filter-tab" type="button" data-status="preparo">Em preparo</button>
+            <button class="filter-tab" type="button" data-status="entrega">Saiu p/ entrega</button>
+            <button class="filter-tab" type="button" data-status="finalizado">Finalizado</button>
+            <button class="filter-tab" type="button" data-status="cancelado">Cancelado</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table" id="orders-table">
+            <thead>
+              <tr><th>Nº</th><th>Cliente</th><th>Itens</th><th>Valor</th><th>Status</th><th>Data</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="orders-body"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <section class="admin-page" id="page-produtos">
@@ -212,10 +254,13 @@
       </form>
     </div>
   </div>
+  <div class="modal" id="order-modal">
+    <div class="modal__box modal__box--wide" id="order-modal-box"></div>
+  </div>
   <div class="toast" id="toast"></div>
 
   <script src="../js/default-data.js?v=6"></script>
   <script src="../js/storage.js?v=6"></script>
-  <script src="admin.js?v=11"></script>
+  <script src="admin.js?v=12"></script>
 </body>
 </html>
